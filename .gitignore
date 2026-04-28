@@ -3,9 +3,4 @@ backend/node_modules
 .env
 backend/.env
 .vscode
-.gitignore
-package-lock.json
-backend/package-lock.json
 .DS_Store
-package.json
-backend/package.json
