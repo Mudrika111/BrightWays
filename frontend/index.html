@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrightWays – Smart Learning Assistant</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { display: flex; flex-direction: column; }
+
+    /* ── HERO ── */
+    #s-home {
+      background: linear-gradient(160deg, #FFFBF5 0%, #F0FFFE 50%, #F5F0FF 100%);
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+    .hero {
+      flex: 1; display: flex; align-items: center;
+      max-width: 1140px; margin: 0 auto;
+      padding: 60px 40px; gap: 60px; flex-wrap: wrap;
+    }
+    .hero-left  { flex: 1 1 340px; }
+    .hero-right { flex: 1 1 320px; display: flex; flex-direction: column; gap: 14px; }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--sun-light); color: var(--sun);
+      padding: 6px 16px; border-radius: 50px;
+      font-weight: 700; font-size: .82rem; margin-bottom: 18px;
+    }
+    .hero-left h1 {
+      font-family: 'Baloo 2', cursive;
+      font-size: clamp(2.2rem, 5vw, 3.2rem);
+      font-weight: 800; line-height: 1.2; margin-bottom: 16px;
+    }
+    .hero-left h1 em { font-style: normal; color: var(--teal); }
+    .hero-left p {
+      color: var(--muted); font-size: 1.05rem;
+      line-height: 1.75; margin-bottom: 32px; max-width: 440px;
+    }
+    .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* Feature cards */
+    .feature-card {
+      background: white; border-radius: var(--r);
+      padding: 18px 20px; display: flex; align-items: center; gap: 16px;
+      box-shadow: var(--shadow); border: 1px solid rgba(255,255,255,.9);
+      transition: transform .2s;
+    }
+    .feature-card:hover { transform: translateY(-3px); }
+    .feature-card:nth-child(2),
+    .feature-card:nth-child(4) { margin-left: 24px; }
+    .fc-icon {
+      width: 48px; height: 48px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; flex-shrink: 0;
+    }
+    .fc-text strong { display: block; font-weight: 700; font-size: .95rem; }
+    .fc-text span   { color: var(--muted); font-size: .82rem; }
+
+    /* Stats bar */
+    .stats-bar {
+      background: white; border-top: 1px solid var(--border);
+      padding: 20px 40px; display: flex;
+    }
+    .stat-item {
+      flex: 1; text-align: center; padding: 0 20px;
+      border-right: 1px solid var(--border);
+    }
+    .stat-item:last-child { border-right: none; }
+    .stat-item .sv {
+      font-family: 'Baloo 2', cursive;
+      font-size: 1.8rem; font-weight: 800; color: var(--sun);
+    }
+    .stat-item .sl {
+      font-size: .78rem; color: var(--muted);
+      font-weight: 600; text-transform: uppercase; letter-spacing: .5px;
+    }
+
+    @media (max-width: 600px) {
+      .hero { padding: 36px 20px; gap: 36px; }
+      .stats-bar { padding: 16px; }
+      .stat-item { padding: 0 10px; }
+      .stat-item .sv { font-size: 1.4rem; }
+      .feature-card:nth-child(2),
+      .feature-card:nth-child(4) { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+<div id="s-home">
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <a class="logo" href="index.html">✦ Bright<span class="logo-dot">Ways</span></a>
+    <div class="nav-right">
+      <a class="btn btn-ghost btn-sm" href="login.html">Login</a>
+      <a class="btn btn-primary btn-sm" href="register.html">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left anim-up">
+      <div class="hero-eyebrow">✦ Learning made joyful</div>
+      <h1>Every child deserves to <em>thrive</em> in learning</h1>
+      <p>BrightWays is a personalised adaptive platform for children with Autism, ADHD, and Dyslexia — with science-backed activities that actually feel like play.</p>
+      <div class="hero-btns">
+        <a class="btn btn-primary btn-lg" href="register.html">Start for Free</a>
+        <a class="btn btn-ghost btn-lg"   href="login.html">I have an account</a>
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <div class="feature-card anim-up" style="animation-delay:.1s">
+        <div class="fc-icon" style="background:#FFF3E0">🧩</div>
+        <div class="fc-text">
+          <strong>Autism Activities</strong>
+          <span>Visual schedules, emotion recognition, social stories</span>
+        </div>
+      </div>
+      <div class="feature-card anim-up" style="animation-delay:.2s">
+        <div class="fc-icon" style="background:#F0F9FF">⚡</div>
+        <div class="fc-text">
+          <strong>ADHD Focus Games</strong>
+          <span>Short-burst tasks, memory challenges with timers</span>
+        </div>
+      </div>
+      <div class="feature-card anim-up" style="animation-delay:.3s">
+        <div class="fc-icon" style="background:#FFF0F3">📖</div>
+        <div class="fc-text">
+          <strong>Dyslexia Phonics</strong>
+          <span>Word recognition, sound matching, phonics fun</span>
+        </div>
+      </div>
+      <div class="feature-card anim-up" style="animation-delay:.4s">
+        <div class="fc-icon" style="background:#F0EFFF">📊</div>
+        <div class="fc-text">
+          <strong>Progress Dashboard</strong>
+          <span>Charts, accuracy trends, session history</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-item"><div class="sv">3</div><div class="sl">Conditions Supported</div></div>
+    <div class="stat-item"><div class="sv">5–12</div><div class="sl">Age Range</div></div>
+    <div class="stat-item"><div class="sv">12+</div><div class="sl">Activities</div></div>
+    <div class="stat-item"><div class="sv">Free</div><div class="sl">To Use</div></div>
+  </div>
+
+</div>
+</body>
+</html>

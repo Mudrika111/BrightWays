@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrightWays – Create Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="register.css">
+</head>
+<body>
+
+<div class="form-side">
+  <div class="form-topbar">
+    <a class="logo" href="index.html">✦ Bright<span>Ways</span></a>
+    <a class="back-link" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </a>
+  </div>
+
+  <div class="step-bar">
+    <div class="step-labels">
+      <span class="step-label active" id="lbl-1">Your Account</span>
+      <span class="step-label"        id="lbl-2">Child's Profile</span>
+      <span class="step-label"        id="lbl-3">Learning Needs</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="prog-fill" style="width:33%"></div>
+    </div>
+  </div>
+
+  <div class="form-body">
+    <input type="hidden" id="condition" name="condition">
+
+    <!-- STEP 1 -->
+    <div class="step-panel active" id="step-1">
+      <div class="step-eyebrow e-teal">
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+        Step 1 of 3
+      </div>
+      <h2>Create your<br>account</h2>
+      <p>This is your caregiver account — you'll use it to monitor your child's progress.</p>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="full-name">Your Full Name</label>
+          <div class="field-wrap">
+            <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <input type="text" id="full-name" name="full_name" placeholder="Jane Doe" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="email">Email Address</label>
+          <div class="field-wrap">
+            <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+            <input type="email" id="email" name="email" placeholder="you@email.com" required>
+          </div>
+        </div>
+        <div class="field">
+          <label for="username">Username</label>
+          <div class="field-wrap">
+            <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94"/></svg>
+            <input type="text" id="username" name="username" placeholder="jane_doe" required autocomplete="username">
+          </div>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <div class="field-wrap">
+            <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <input type="password" id="password" name="password" placeholder="min. 8 characters" required autocomplete="new-password">
+          </div>
+        </div>
+      </div>
+
+      <div class="error-box" id="err-1"></div>
+      <div class="btn-row">
+        <button type="button" class="btn-next" onclick="goStep(2)">
+          <span>Continue</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-panel" id="step-2">
+      <div class="step-eyebrow e-amber">
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+        Step 2 of 3
+      </div>
+      <h2>Tell us about<br>your child</h2>
+      <p>We use this to personalise activities and track progress over time.</p>
+
+      <div class="field">
+        <label for="child-name">Child's Name</label>
+        <div class="field-wrap">
+          <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          <input type="text" id="child-name" name="child_name" placeholder="e.g. Alex" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Child's Age</label>
+        <div class="age-display">
+          <span class="age-num" id="age-display">7</span>
+          <span class="age-label">years old</span>
+        </div>
+        <input type="range" id="child-age" name="child_age"
+               min="5" max="12" value="7"
+               oninput="updateAge(this.value)">
+      </div>
+
+      <div class="error-box" id="err-2"></div>
+      <div class="btn-row">
+        <button type="button" class="btn-prev" onclick="goStep(1)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Back
+        </button>
+        <button type="button" class="btn-next" onclick="goStep(3)">
+          <span>Continue</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step-panel" id="step-3">
+      <div class="step-eyebrow e-violet">
+        <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor"><circle cx="4" cy="4" r="4"/></svg>
+        Step 3 of 3
+      </div>
+      <h2>What does your<br>child need?</h2>
+      <p>We'll tailor every activity to fit your child's learning style. You can update this anytime.</p>
+
+      <div class="cond-grid">
+        <div class="cond-card" data-cond="Dyslexia" onclick="pickCond(this)">
+          <div class="cond-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="cond-emoji">📖</span>
+          <span class="cond-name">Dyslexia</span>
+          <span class="cond-desc">Phonics, word recognition &amp; reading support</span>
+        </div>
+        <div class="cond-card" data-cond="ADHD" onclick="pickCond(this)">
+          <div class="cond-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="cond-emoji">⚡</span>
+          <span class="cond-name">ADHD</span>
+          <span class="cond-desc">Short focus tasks, memory games &amp; timers</span>
+        </div>
+        <div class="cond-card" data-cond="Autism" onclick="pickCond(this)">
+          <div class="cond-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <span class="cond-emoji">🌈</span>
+          <span class="cond-name">Autism</span>
+          <span class="cond-desc">Visual schedules, emotion &amp; social stories</span>
+        </div>
+      </div>
+
+      <div class="error-box" id="err-3"></div>
+      <div class="btn-row">
+        <button type="button" class="btn-prev" onclick="goStep(2)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          Back
+        </button>
+        <button type="button" class="btn-next" id="submit-btn" onclick="handleSubmit()">
+          <span class="btn-text">Create Profile</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="arrow-icon"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          <div class="spinner" id="spinner"></div>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="form-footer">
+    Already have an account? <a href="login.html">Sign in here</a>
+  </div>
+</div>
+
+<div class="info-side">
+  <div class="iblob ib1"></div>
+  <div class="iblob ib2"></div>
+  <div class="iblob ib3"></div>
+
+  <div class="floaters">
+    <span class="floater" style="top:8%; left:12%;--dur:3.8s;--delay:0s;  --ra:-7deg;--rb:5deg">🌟</span>
+    <span class="floater" style="top:20%;right:14%;--dur:4.5s;--delay:.5s;--ra:4deg;--rb:-6deg">⚡</span>
+    <span class="floater" style="top:38%;left:8%; --dur:3.3s;--delay:.2s; --ra:-4deg;--rb:8deg">📖</span>
+    <span class="floater" style="top:52%;right:10%;--dur:5.1s;--delay:.8s;--ra:6deg;--rb:-3deg">🎯</span>
+    <span class="floater" style="top:66%;left:22%;--dur:4.2s;--delay:.3s; --ra:-3deg;--rb:7deg">🧩</span>
+  </div>
+
+  <div class="info-copy">
+    <h3>Three steps to<br>a <em>brighter</em> future</h3>
+    <p>It takes under 2 minutes. After that, your child gets a personalised space built around how they learn.</p>
+
+    <div class="step-previews">
+      <div class="preview-item active" id="prev-1">
+        <div class="preview-dot">1</div>
+        <div class="preview-text">
+          <strong>Your account</strong>
+          <span>Name, email &amp; login details</span>
+        </div>
+      </div>
+      <div class="preview-item" id="prev-2">
+        <div class="preview-dot">2</div>
+        <div class="preview-text">
+          <strong>Child's profile</strong>
+          <span>Name and age</span>
+        </div>
+      </div>
+      <div class="preview-item" id="prev-3">
+        <div class="preview-dot">3</div>
+        <div class="preview-text">
+          <strong>Learning needs</strong>
+          <span>Condition &amp; preferences</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function updateAge(val) {
+    document.getElementById('age-display').textContent = val;
+    const pct = ((val - 5) / (12 - 5)) * 100;
+    document.getElementById('child-age').style.background =
+      `linear-gradient(90deg, #00A878 ${pct}%, #e5e7eb ${pct}%)`;
+  }
+  updateAge(7);
+
+  function pickCond(el) {
+    document.querySelectorAll('.cond-card').forEach(c => c.classList.remove('sel'));
+    el.classList.add('sel');
+    document.getElementById('condition').value = el.dataset.cond;
+  }
+
+  function validateStep1() {
+    const name     = document.getElementById('full-name').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    if (!name || !email || !username || !password) {
+      document.getElementById('err-1').textContent = 'Please fill all fields';
+      return false;
+    }
+    if (password.length < 6) {
+      document.getElementById('err-1').textContent = 'Password too short';
+      return false;
+    }
+    document.getElementById('err-1').textContent = '';
+    return true;
+  }
+
+  function validateStep2() {
+    const childName = document.getElementById('child-name').value.trim();
+    if (!childName) {
+      document.getElementById('err-2').textContent = "Please enter your child's name";
+      return false;
+    }
+    document.getElementById('err-2').textContent = '';
+    return true;
+  }
+
+  function goStep(n) {
+    if (n === 2 && !validateStep1()) return;
+    if (n === 3 && !validateStep2()) return;
+
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('step-' + n).classList.add('active');
+
+    const pct = { 1: '33%', 2: '66%', 3: '100%' };
+    document.getElementById('prog-fill').style.width = pct[n];
+
+    document.querySelectorAll('.preview-item').forEach(p => p.classList.remove('active'));
+    document.getElementById('prev-' + n).classList.add('active');
+
+    document.querySelectorAll('.step-label').forEach(l => l.classList.remove('active'));
+    document.getElementById('lbl-' + n).classList.add('active');
+  }
+
+  async function handleSubmit() {
+    const condition = document.getElementById('condition').value;
+    if (!condition) {
+      document.getElementById('err-3').textContent = 'Please select a condition';
+      return;
+    }
+
+    const btn     = document.getElementById('submit-btn');
+    const spinner = document.getElementById('spinner');
+    btn.disabled  = true;
+    spinner.style.display = 'block';
+
+    const payload = {
+      full_name:  document.getElementById('full-name').value.trim(),
+      email:      document.getElementById('email').value.trim(),
+      username:   document.getElementById('username').value.trim(),
+      password:   document.getElementById('password').value,
+      child_name: document.getElementById('child-name').value.trim(),
+      child_age:  document.getElementById('child-age').value,
+      condition:  condition
+    };
+
+    try {
+      const res  = await fetch('http://localhost:5000/api/register', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      localStorage.removeItem("bw_user");
+
+      // Save caregiver's id so dashboardcaregiver.html loads correctly
+      const safeUser = {
+        id:        data.user.id,       // caregiver id
+        username:  data.user.username,
+        name:      data.user.username,
+        condition: null
+      };
+
+      localStorage.setItem("bw_user", JSON.stringify(safeUser));
+
+      // Redirect to caregiver dashboard
+      window.location.href = 'dashboardcaregiver.html';
+
+    } catch (err) {
+      document.getElementById('err-3').textContent = err.message;
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+    }
+  }
+</script>
+
+</body>
+</html>

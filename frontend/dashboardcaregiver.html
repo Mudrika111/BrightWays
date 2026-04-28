@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrightWays – Caregiver Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --teal: #00B894; --teal-light: #E6F9F5;
+      --violet: #6C63FF; --violet-light: #EFEEFD;
+      --sun: #FF9500; --sun-light: #FFF3E0;
+      --rose: #FF6584; --rose-light: #FFF0F3;
+      --sky: #0EA5E9; --sky-light: #E0F4FD;
+      --border: #E5E7EB; --muted: #9CA3AF;
+      --r: 14px; --shadow-lg: 0 8px 32px rgba(0,0,0,.10);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; min-height: 100vh; background: #F4F6FA; color: #1a1a2e; }
+    .navbar { display: flex; align-items: center; justify-content: space-between; padding: 0 28px; height: 60px; background: white; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; }
+    .logo { font-family: 'Baloo 2', cursive; font-size: 1.3rem; font-weight: 800; text-decoration: none; color: #1a1a2e; }
+    .logo-dot { color: var(--violet); }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-badge { font-size: .75rem; font-weight: 700; padding: 5px 12px; border-radius: 50px; background: var(--violet-light); color: var(--violet); }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 8px; font-weight: 700; font-size: .85rem; text-decoration: none; cursor: pointer; border: none; transition: .18s; }
+    .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: #555; }
+    .btn-ghost:hover { background: #f5f5f5; }
+    .btn-sm { padding: 6px 14px; font-size: .8rem; }
+    main { flex: 1; }
+    .content { max-width: 1100px; margin: 0 auto; padding: 28px 32px 60px; }
+    .state-box { text-align: center; padding: 80px 20px; font-family: 'Baloo 2', cursive; color: var(--muted); font-size: 1.1rem; }
+    .spinner { width: 40px; height: 40px; border-radius: 50%; border: 4px solid var(--border); border-top-color: var(--violet); animation: spin .8s linear infinite; margin: 0 auto 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .cg-header { margin-bottom: 24px; }
+    .cg-header h2 { font-family: 'Baloo 2', cursive; font-size: 1.8rem; font-weight: 800; }
+    .cg-header p { color: var(--muted); font-size: .92rem; margin-top: 3px; }
+    .child-tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 26px; align-items: center; }
+    .tabs-label { font-size: .82rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
+    .ctab { padding: 9px 20px; border-radius: 50px; border: 1.5px solid var(--border); background: white; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: .84rem; cursor: pointer; transition: all .18s; }
+    .ctab:hover { border-color: var(--violet); color: var(--violet); }
+    .ctab.active { background: var(--violet); color: white; border-color: var(--violet); box-shadow: 0 3px 12px rgba(108,99,255,.30); }
+    .cond-pill { display: inline-block; font-size: .68rem; font-weight: 700; padding: 1px 7px; border-radius: 50px; margin-left: 5px; vertical-align: middle; text-transform: uppercase; letter-spacing: .4px; }
+    .pill-adhd { background: #E0F4FD; color: #0550A0; }
+    .pill-dyslexia { background: #FFF3E0; color: #A85F00; }
+    .pill-autism { background: #EFEEFD; color: #3D36A0; }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(165px, 1fr)); gap: 16px; margin-bottom: 22px; }
+    .kpi-card { background: white; border-radius: var(--r); padding: 20px 22px; border: 1px solid var(--border); }
+    .kpi-label { font-size: .74rem; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 6px; }
+    .kpi-val { font-family: 'Baloo 2', cursive; font-size: 2rem; font-weight: 800; line-height: 1.1; }
+    .kpi-sub { font-size: .76rem; color: var(--muted); margin-top: 4px; }
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; }
+    .chart-card { background: white; border-radius: var(--r); padding: 22px; border: 1px solid var(--border); }
+    .chart-card h4 { font-family: 'Baloo 2', cursive; font-weight: 700; font-size: .97rem; margin-bottom: 16px; color: #1a1a2e; }
+    .table-card { background: white; border-radius: var(--r); border: 1px solid var(--border); overflow: hidden; }
+    .table-card h4 { font-family: 'Baloo 2', cursive; font-weight: 700; font-size: .97rem; padding: 18px 22px 12px; }
+    .empty-row td { text-align: center; color: var(--muted); font-size: .88rem; padding: 32px 18px !important; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #F9FAFB; padding: 10px 18px; text-align: left; font-size: .73rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); }
+    td { padding: 12px 18px; font-size: .86rem; border-bottom: 1px solid #F3F4F6; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFAFA; }
+    .mini-bar { display: flex; align-items: center; gap: 8px; }
+    .mini-track { flex: 1; height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; min-width: 60px; }
+    .mini-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
+    .badge-done { background: #DCFCE7; color: #166534; font-size: .72rem; font-weight: 700; padding: 3px 9px; border-radius: 50px; }
+
+    @media (max-width: 720px) {
+      .charts-grid { grid-template-columns: 1fr; }
+      .content { padding: 20px 16px 40px; }
+      th:nth-child(5), td:nth-child(5) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a class="logo" href="index.html">✦ Bright<span class="logo-dot">Ways</span></a>
+  <div class="nav-right">
+    <span class="nav-badge">Caregiver View</span>
+    <a class="btn btn-ghost btn-sm" href="login.html" onclick="logout()">Logout</a>
+  </div>
+</nav>
+
+<main>
+  <div class="content">
+
+    <div id="state-loading" class="state-box">
+      <div class="spinner"></div>
+      Loading dashboard…
+    </div>
+    <div id="state-error" class="state-box" style="display:none">
+      ⚠️ Could not load dashboard.<br>
+      <small id="err-msg" style="font-size:.8rem;margin-top:8px;display:block"></small>
+    </div>
+
+    <div id="dashboard" style="display:none">
+      <div class="cg-header">
+        <h2 id="cg-name">Welcome back!</h2>
+        <p id="cg-sub">Here's how your children are progressing today.</p>
+      </div>
+      <div class="child-tabs">
+        <span class="tabs-label">Viewing:</span>
+        <div id="tabs-container" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-label">Avg Accuracy</div>
+          <div class="kpi-val" id="kpi-accuracy" style="color:var(--teal)">—</div>
+          <div class="kpi-sub">Across all sessions</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Total Sessions</div>
+          <div class="kpi-val" id="kpi-sessions" style="color:var(--sun)">—</div>
+          <div class="kpi-sub">All time</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Completed</div>
+          <div class="kpi-val" id="kpi-completed" style="color:var(--violet)">—</div>
+          <div class="kpi-sub">Unique activities done</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Condition</div>
+          <div class="kpi-val" id="kpi-condition" style="color:var(--sky);font-size:1.3rem;padding-top:6px">—</div>
+          <div class="kpi-sub" id="kpi-age"></div>
+        </div>
+      </div>
+      <div class="charts-grid">
+        <div class="chart-card">
+          <h4>📈 Accuracy Trend — Last 10 Sessions</h4>
+          <canvas id="lineChart" height="180"></canvas>
+        </div>
+        <div class="chart-card">
+          <h4>🎮 Activity Completions</h4>
+          <canvas id="barChart" height="180"></canvas>
+        </div>
+      </div>
+      <div class="table-card">
+        <h4>📋 Recent Sessions</h4>
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Activity</th><th>Type</th><th>Score</th><th>Duration</th><th>Status</th></tr>
+          </thead>
+          <tbody id="sessions-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  const API_BASE = "http://localhost:5000/api";
+  const stored   = JSON.parse(localStorage.getItem("bw_user") || "{}");
+  if (!stored || !stored.id) window.location.href = "login.html";
+
+  function logout() { localStorage.removeItem("bw_user"); }
+
+  let allChildren = [], activeIdx = 0, lineChart = null, barChart = null;
+
+  function scoreColor(pct) {
+    if (pct >= 80) return "var(--teal)";
+    if (pct >= 60) return "#F59E0B";
+    return "var(--rose)";
+  }
+  function condPillClass(type) {
+    if (!type) return "";
+    const t = type.toLowerCase();
+    if (t === "adhd") return "pill-adhd";
+    if (t === "dyslexia") return "pill-dyslexia";
+    if (t === "autism") return "pill-autism";
+    return "";
+  }
+  function capFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
+
+  function buildTabs(children) {
+    document.getElementById("tabs-container").innerHTML = children.map((c, i) => `
+      <button class="ctab${i === 0 ? " active" : ""}" onclick="switchChild(this,${i})">
+        ${c.child_name}
+        <span class="cond-pill ${condPillClass(c.condition_type)}">${capFirst(c.condition_type)}</span>
+      </button>`).join("");
+  }
+
+  function renderKPIs(child) {
+    const s = child.statistics || {};
+    document.getElementById("kpi-accuracy").textContent  = s.avg_score != null ? s.avg_score + "%" : "—";
+    document.getElementById("kpi-sessions").textContent  = s.total_sessions ?? "—";
+    document.getElementById("kpi-completed").textContent = s.total_completed ?? "—";
+    document.getElementById("kpi-condition").textContent = capFirst(child.condition_type) || "—";
+    document.getElementById("kpi-age").textContent       = child.child_age ? `Age ${child.child_age}` : "";
+  }
+
+  function renderTable(sessions) {
+    const tbody = document.getElementById("sessions-tbody");
+    if (!sessions || sessions.length === 0) {
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No sessions recorded yet 🎮</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = sessions.map(s => `
+      <tr>
+        <td>${s.date}</td><td>${s.activity}</td><td>${s.type}</td>
+        <td>
+          <div class="mini-bar">
+            <div class="mini-track"><div class="mini-fill" style="width:${s.score}%;background:${scoreColor(s.score)}"></div></div>
+            <span style="font-weight:700;min-width:38px">${s.score}%</span>
+          </div>
+        </td>
+        <td>${s.time}</td>
+        <td><span class="badge-done">✓ Done</span></td>
+      </tr>`).join("");
+  }
+
+  function renderCharts(trend, breakdown) {
+    if (lineChart) lineChart.destroy();
+    if (barChart)  barChart.destroy();
+    const lineData  = (trend?.data?.length)     ? trend     : { labels: ["No data"], data: [0] };
+    const breakData = (breakdown?.data?.length) ? breakdown : { labels: ["No data"], data: [0] };
+    lineChart = new Chart(document.getElementById("lineChart"), {
+      type: "line",
+      data: { labels: lineData.labels, datasets: [{ label: "Accuracy %", data: lineData.data, borderColor: "#00B894", backgroundColor: "rgba(0,184,148,0.08)", tension: .4, pointBackgroundColor: "#00B894", pointRadius: 5, fill: true, pointHoverRadius: 7 }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 }, x: { grid: { display: false } } }, responsive: true }
+    });
+    barChart = new Chart(document.getElementById("barChart"), {
+      type: "bar",
+      data: { labels: breakData.labels.map(capFirst), datasets: [{ data: breakData.data, backgroundColor: ["#FF9500","#0EA5E9","#6C63FF","#FF6584","#00B894"], borderRadius: 8, borderSkipped: false }] },
+      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false } } }, responsive: true }
+    });
+  }
+
+  function switchChild(btn, idx) {
+    document.querySelectorAll(".ctab").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeIdx = idx;
+    renderChild(allChildren[idx]);
+  }
+  function renderChild(child) {
+    renderKPIs(child);
+    renderTable(child.sessions);
+    renderCharts(child.accuracy_trend, child.activity_breakdown);
+  }
+
+  function showLoading()   { document.getElementById("state-loading").style.display = ""; document.getElementById("state-error").style.display = "none"; document.getElementById("dashboard").style.display = "none"; }
+  function showError(msg)  { document.getElementById("state-loading").style.display = "none"; document.getElementById("state-error").style.display = ""; document.getElementById("dashboard").style.display = "none"; document.getElementById("err-msg").textContent = msg || ""; }
+  function showDashboard() { document.getElementById("state-loading").style.display = "none"; document.getElementById("state-error").style.display = "none"; document.getElementById("dashboard").style.display = ""; }
+
+  async function init() {
+    showLoading();
+
+    try {
+      const res  = await fetch(`${API_BASE}/caregiver?caregiver_id=${stored.id}`);
+      const data = await res.json();
+
+      if (!data.success) {
+        showError("API error: " + (data.message || "unknown"));
+        return;
+      }
+
+      const cg = data.caregiver;
+      document.getElementById("cg-name").textContent = `Welcome back, ${cg.first_name || cg.username}! 👋`;
+      document.getElementById("cg-sub").textContent  = data.children.length
+        ? `Here's how your ${data.children.length === 1 ? "child is" : `${data.children.length} children are`} progressing.`
+        : "No child profiles linked yet.";
+
+      allChildren = data.children;
+
+      if (allChildren.length === 0) {
+        showDashboard();
+        document.getElementById("tabs-container").innerHTML = `<span style="color:var(--muted);font-size:.85rem">No children linked to your account.</span>`;
+        document.getElementById("sessions-tbody").innerHTML = `<tr class="empty-row"><td colspan="6">No sessions yet.</td></tr>`;
+        return;
+      }
+
+      buildTabs(allChildren);
+      showDashboard();
+      renderChild(allChildren[0]);
+
+    } catch (err) {
+      showError("Could not reach the server — " + err.message);
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>
