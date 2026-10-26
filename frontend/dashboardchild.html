@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrightWays – My Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body { display: flex; flex-direction: column; min-height: 100vh; }
+    main { background: linear-gradient(180deg, #FFFBF5 0%, #FAFAFA 300px); flex: 1; display: flex; flex-direction: column; }
+    .child-hero { padding: 32px 32px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .child-greet h2 { font-family: 'Baloo 2', cursive; font-size: 2rem; font-weight: 800; }
+    .child-greet p  { color: var(--muted); font-size: .95rem; margin-top: 2px; }
+    .streak-badge { background: linear-gradient(135deg, #FF9500, #FFCC02); color: white; padding: 10px 20px; border-radius: 50px; font-weight: 800; font-size: .88rem; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(255,149,0,.35); white-space: nowrap; align-self: flex-start; }
+    .prog-section { padding: 20px 32px 0; }
+    .prog-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .prog-top span  { font-weight: 700; font-size: .85rem; color: var(--muted); }
+    .prog-top strong{ font-weight: 800; font-size: .9rem; }
+    .prog-track { background: var(--border); border-radius: 99px; height: 10px; overflow: hidden; }
+    .prog-fill  { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--teal), #00D4AA); transition: width .8s cubic-bezier(.22,1,.36,1); }
+    .section-head { padding: 28px 32px 0; }
+    .section-head h3 { font-family: 'Baloo 2', cursive; font-size: 1.3rem; font-weight: 800; }
+    .act-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px; padding: 16px 32px 40px; }
+    .act-card { background: white; border-radius: var(--r); padding: 24px 18px; text-align: center; border: 1.5px solid var(--border); cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s; position: relative; overflow: hidden; text-decoration: none; color: inherit; display: block; }
+    .act-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 4px; border-radius: 0 0 var(--r) var(--r); opacity: 0; transition: opacity .2s; }
+    .act-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); border-color: transparent; }
+    .act-card:hover::after { opacity: 1; }
+    .act-card.c-sun::after    { background: var(--sun); }
+    .act-card.c-teal::after   { background: var(--teal); }
+    .act-card.c-violet::after { background: var(--violet); }
+    .act-card.c-rose::after   { background: var(--rose); }
+    .act-card.c-sky::after    { background: var(--sky); }
+    /* Completed card styling */
+    .act-card.completed { border-color: #00B894; background: #F0FFF9; }
+    .act-card.completed::before { content: '✓ Done'; position: absolute; top: 10px; right: 10px; background: #00B894; color: white; font-size: .65rem; font-weight: 800; padding: 3px 8px; border-radius: 50px; }
+    .act-icon  { font-size: 2.8rem; margin-bottom: 12px; display: block; }
+    .act-name  { font-family: 'Baloo 2', cursive; font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+    .act-stars { font-size: .85rem; color: #FFC107; letter-spacing: 2px; margin-bottom: 10px; }
+    .act-tag   { display: inline-block; padding: 3px 12px; border-radius: 50px; font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+    .tag-sun    { background: var(--sun-light);    color: #A85F00; }
+    .tag-teal   { background: var(--teal-light);   color: #006E55; }
+    .tag-violet { background: var(--violet-light); color: #3D36A0; }
+    .tag-rose   { background: var(--rose-light);   color: #A03050; }
+    .tag-sky    { background: var(--sky-light);    color: #0550A0; }
+    @media (max-width: 600px) {
+      .act-grid { grid-template-columns: repeat(2,1fr); padding: 12px 16px 28px; }
+      .child-hero, .prog-section, .section-head { padding-left: 16px; padding-right: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a class="logo" href="index.html">✦ Bright<span class="logo-dot">Ways</span></a>
+    <div class="nav-right">
+      <span class="nav-badge" id="cond-badge">Loading…</span>
+      <a class="btn btn-ghost btn-sm" href="login.html" onclick="logout()">Logout</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="child-hero">
+      <div class="child-greet">
+        <h2 id="greet-text">Hi there! 👋</h2>
+        <p  id="greet-sub">Ready for today's activities?</p>
+      </div>
+      <div class="streak-badge">🔥 3-day streak!</div>
+    </div>
+
+    <div class="prog-section">
+      <div class="prog-top">
+        <span>Today's Progress</span>
+        <strong id="prog-label">0 / 4 done</strong>
+      </div>
+      <div class="prog-track">
+        <div class="prog-fill" id="prog-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="section-head"><h3>🎮 Your Activities</h3></div>
+    <div class="act-grid" id="act-grid"></div>
+  </main>
+
+  <script>
+    // Each activity card has a unique CARD_KEY that matches what the activity page saves.
+    const ACTIVITIES = {
+      ADHD: [
+        { icon:'🧠', name:'Memory Match',  stars:2, tag:'Memory',    tc:'tag-sky',    cc:'c-sky',    href:'activityadhd.html',     cardKey:'bw_done_adhd_memory'   },
+        { icon:'⚡', name:'Quick Recall',  stars:1, tag:'Focus',     tc:'tag-teal',   cc:'c-teal',   href:'activityadhd.html',     cardKey:'bw_done_adhd_recall'   },
+        { icon:'🎯', name:'Spot the Diff', stars:3, tag:'Challenge', tc:'tag-violet', cc:'c-violet', href:'activityadhd.html',     cardKey:'bw_done_adhd_spot'     },
+        { icon:'🔢', name:'Number Dash',   stars:2, tag:'Attention', tc:'tag-sun',    cc:'c-sun',    href:'activityadhd.html',     cardKey:'bw_done_adhd_number'   }
+      ],
+      Dyslexia: [
+        { icon:'🔤', name:'Phonics Play',  stars:1, tag:'Phonics',   tc:'tag-sun',    cc:'c-sun',    href:'activitydyxlexia.html', cardKey:'bw_done_dyslexia_phonics'  },
+        { icon:'📖', name:'Word Match',    stars:2, tag:'Reading',   tc:'tag-teal',   cc:'c-teal',   href:'activitydyxlexia.html', cardKey:'bw_done_dyslexia_word'     },
+        { icon:'🎵', name:'Rhyme Time',    stars:2, tag:'Phonics',   tc:'tag-rose',   cc:'c-rose',   href:'activitydyxlexia.html', cardKey:'bw_done_dyslexia_rhyme'    },
+        { icon:'🔡', name:'Letter Sounds', stars:3, tag:'Challenge', tc:'tag-violet', cc:'c-violet', href:'activitydyxlexia.html', cardKey:'bw_done_dyslexia_letters'  }
+      ],
+      Autism: [
+        { icon:'📅', name:'My Routine',   stars:1, tag:'Daily',    tc:'tag-violet', cc:'c-violet', href:'activityautism.html',   cardKey:'bw_done_autism_routine'  },
+        { icon:'😊', name:'Feelings',     stars:2, tag:'Emotions', tc:'tag-rose',   cc:'c-rose',   href:'activityautism.html',   cardKey:'bw_done_autism_feelings' },
+        { icon:'📖', name:'Story Time',   stars:2, tag:'Social',   tc:'tag-teal',   cc:'c-teal',   href:'activityautism.html',   cardKey:'bw_done_autism_story'    },
+        { icon:'🎨', name:'Sort & Match', stars:1, tag:'Visual',   tc:'tag-sky',    cc:'c-sky',    href:'activityautism.html',   cardKey:'bw_done_autism_sort'     }
+      ]
+    };
+
+    function normaliseCondition(raw) {
+      if (!raw) return 'ADHD';
+      const s = raw.trim().toLowerCase();
+      if (s === 'adhd')     return 'ADHD';
+      if (s === 'dyslexia') return 'Dyslexia';
+      if (s === 'autism')   return 'Autism';
+      return raw.charAt(0).toUpperCase() + raw.slice(1);
+    }
+
+    // ── FIX: scope localStorage keys per child user id ──────────────────
+    // This prevents User A's completed cards from showing as done for User B.
+    // We use child_user_id (the child's own account id) as the namespace.
+    let CHILD_UID = null;
+
+    function localKey(cardKey) {
+      const today = new Date().toDateString();
+      // Prefix with child user id so different children never share keys
+      return `uid${CHILD_UID}_${cardKey}_${today}`;
+    }
+
+    function isCardDone(cardKey) {
+      return localStorage.getItem(localKey(cardKey)) === "1";
+    }
+
+    function countDoneCards(acts) {
+      return acts.filter(a => isCardDone(a.cardKey)).length;
+    }
+
+    function updateProgress(done, total) {
+      document.getElementById('prog-label').textContent = `${done} / ${total} done`;
+      document.getElementById('prog-fill').style.width  = `${Math.min((done / total) * 100, 100)}%`;
+    }
+
+    function buildGrid(condition) {
+      const acts = ACTIVITIES[condition] || ACTIVITIES['ADHD'];
+
+      document.getElementById('act-grid').innerHTML = acts.map(a => {
+        const done = isCardDone(a.cardKey);
+        return `
+          <a class="act-card ${a.cc}${done ? ' completed' : ''}"
+             href="${a.href}?card=${a.cardKey}">
+            <span class="act-icon">${a.icon}</span>
+            <div class="act-name">${a.name}</div>
+            <div class="act-stars">${'⭐'.repeat(a.stars)}${'☆'.repeat(3 - a.stars)}</div>
+            <span class="act-tag ${a.tc}">${a.tag}</span>
+          </a>
+        `;
+      }).join('');
+
+      updateProgress(countDoneCards(acts), 4);
+    }
+
+    function logout() {
+      localStorage.removeItem("bw_user");
+    }
+
+    async function init() {
+      const raw    = localStorage.getItem('bw_user');
+      const stored = raw ? JSON.parse(raw) : null;
+      if (!stored || !stored.id) { window.location.href = 'login.html'; return; }
+
+      // ── FIX: use child_user_id as the activity user id ──────────────
+      // If child_user_id is null (shouldn't happen after register), fall
+      // back to the caregiver id so the page still works but log a warning.
+      CHILD_UID = stored.child_user_id || stored.id;
+      if (!stored.child_user_id) {
+        console.warn("BrightWays: child_user_id missing from stored user — " +
+          "activity progress may be shared with caregiver account. " +
+          "Please log out and log in again.");
+      }
+
+      const condition = normaliseCondition(stored.condition);
+      const name      = stored.name || stored.username || 'there';
+
+      document.getElementById('greet-text').textContent = `Hi ${name}! 👋`;
+      document.getElementById('greet-sub').textContent  = `${condition} activities just for you ✨`;
+      document.getElementById('cond-badge').textContent = condition;
+
+      buildGrid(condition);
+    }
+
+    init();
+  </script>
+
+</body>
+</html>
