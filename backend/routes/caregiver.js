@@ -4,14 +4,7 @@ const db = require("../db");
 
 // GET caregiver dashboard
 router.get("/", async (req, res) => {
-  const caregiver_id = parseInt(req.query.caregiver_id);
-
-  if (!caregiver_id) {
-    return res.status(400).json({
-      success: false,
-      message: "Missing caregiver_id"
-    });
-  }
+  const caregiver_id = req.session.user.id;
 
   try {
     // 🔹 Verify caregiver

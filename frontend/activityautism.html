@@ -80,7 +80,7 @@
 /* ═══════════════════════════════════════════════════════════════
    SHARED SETUP
 ═══════════════════════════════════════════════════════════════ */
-const API_URL       = "http://localhost:5000/api/activity";
+const API_URL       = "/api/activity";
 const USER          = JSON.parse(localStorage.getItem("bw_user") || "{}");
 const USER_ID       = USER.child_user_id || USER.id;
 const ACTIVITY_TYPE = "autism";
@@ -103,8 +103,8 @@ async function saveAndFinish(score, total, modalTitle) {
     const res = await fetch(API_URL, {
       method:  "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({
-        user_id:            USER_ID,
         activity_type:      ACTIVITY_TYPE,
         score_percent:      percent,
         time_spent_seconds: timeSpent

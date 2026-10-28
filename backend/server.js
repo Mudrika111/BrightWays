@@ -1,18 +1,64 @@
+
+require("dotenv").config();
+
 const express = require("express");
-const cors = require("cors");
+const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
+const path = require("path");
 
 const app = express();
+const PORT = process.env.PORT || 5000;
+const { requireAuth, requireRole } = require("./middleware/auth");
 
-app.use(cors());
+// Require a session secret instead of using a predictable default.
+if (!process.env.SESSION_SECRET) {
+  throw new Error("SESSION_SECRET is missing from backend/.env");
+}
+
 app.use(express.json());
 
-app.use("/api/activity", require("./routes/activity"));
-app.use("/api/caregiver", require("./routes/caregiver"));
-app.use("/api/dashboard", require("./routes/dashboard"));
+// Store sessions in MySQL so they survive server restarts.
+const sessionStore = new MySQLStore({
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  createDatabaseTable: true,
+  clearExpired: true,
+  checkExpirationInterval: 15 * 60 * 1000
+});
+
+app.use(
+  session({
+    name: "bw.sid",
+    secret: process.env.SESSION_SECRET,
+    store: sessionStore,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 2 * 60 * 60 * 1000
+    }
+  })
+);
+
+// Serve the existing frontend from the same origin.
+const frontendPath = path.join(__dirname, "../frontend");
+app.use(express.static(frontendPath));
+
+// API routes
+app.use("/api/activity", requireAuth, requireRole("child"), require("./routes/activity"));
+app.use("/api/caregiver", requireAuth, requireRole("caregiver"), require("./routes/caregiver"));
+app.use("/api/dashboard", requireAuth, requireRole("child"), require("./routes/dashboard"));
 app.use("/api/login", require("./routes/login"));
 app.use("/api/register", require("./routes/register"));
+app.use("/api/session", require("./routes/session"));
 
-const caregiverRoute = require("./routes/caregiver");
-app.use("/api/caregiver", caregiverRoute);
+// Do not mount /api/caregiver a second time.
 
-app.listen(5000, () => console.log("Server running on port 5000"));
+app.listen(PORT, () => {
+  console.log(`BrightWays server running at http://localhost:${PORT}`);
+});

@@ -4,11 +4,12 @@ const db      = require("../db");
 
 router.get("/", async (req, res) => {
   try {
-    const { user_id } = req.query;
-    if (!user_id) return res.status(400).json({ success: false, message: "user_id required" });
+    const user_id = req.session.user.id;
 
     const [[user]] = await db.execute(
-      "SELECT id, username, first_name, last_name, user_type FROM users WHERE id = ?",
+      `SELECT id, username, first_name, last_name, user_type
+       FROM users
+       WHERE id = ? AND user_type = 'child'`,
       [user_id]
     );
     if (!user) return res.status(404).json({ success: false, message: "User not found" });

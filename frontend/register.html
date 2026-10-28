@@ -304,9 +304,10 @@
     };
 
     try {
-      const res  = await fetch('http://localhost:5000/api/register', {
+      const res  = await fetch('/api/register', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body:    JSON.stringify(payload)
       });
 
@@ -323,7 +324,8 @@
         id:        data.user.id,       // caregiver id
         username:  data.user.username,
         name:      data.user.username,
-        condition: null
+        condition: null,
+        user_type: 'caregiver'
       };
 
       localStorage.setItem("bw_user", JSON.stringify(safeUser));

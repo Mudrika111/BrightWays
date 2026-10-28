@@ -19,9 +19,10 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { user_id, activity_type, score_percent, time_spent_seconds } = req.body;
+    const { activity_type, score_percent, time_spent_seconds } = req.body;
+    const user_id = req.session.user.id;
 
-    if (!user_id || !activity_type) {
+    if (!activity_type) {
       return res.status(400).json({ success: false, message: "Missing required fields" });
     }
 

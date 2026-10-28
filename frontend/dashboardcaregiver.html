@@ -79,7 +79,7 @@
   <a class="logo" href="index.html">✦ Bright<span class="logo-dot">Ways</span></a>
   <div class="nav-right">
     <span class="nav-badge">Caregiver View</span>
-    <a class="btn btn-ghost btn-sm" href="login.html" onclick="logout()">Logout</a>
+    <a class="btn btn-ghost btn-sm" href="login.html" onclick="logout(event)">Logout</a>
   </div>
 </nav>
 
@@ -150,11 +150,22 @@
 </main>
 
 <script>
-  const API_BASE = "http://localhost:5000/api";
-  const stored   = JSON.parse(localStorage.getItem("bw_user") || "{}");
-  if (!stored || !stored.id) window.location.href = "login.html";
+  const API_BASE = "/api";
+  let stored = {};
 
-  function logout() { localStorage.removeItem("bw_user"); }
+  async function logout(event) {
+    event.preventDefault();
+    try {
+      await fetch(`${API_BASE}/session/logout`, {
+        method: "POST",
+        credentials: "include"
+      });
+    } catch (err) {
+      console.error("Logout request failed:", err);
+    }
+    localStorage.removeItem("bw_user");
+    window.location.href = "login.html";
+  }
 
   let allChildren = [], activeIdx = 0, lineChart = null, barChart = null;
 
@@ -247,7 +258,31 @@
     showLoading();
 
     try {
-      const res  = await fetch(`${API_BASE}/caregiver?caregiver_id=${stored.id}`);
+      const sessionResponse = await fetch(`${API_BASE}/session`, {
+        credentials: "include"
+      });
+      if (!sessionResponse.ok) {
+        localStorage.removeItem("bw_user");
+        window.location.href = "login.html";
+        return;
+      }
+
+      const sessionData = await sessionResponse.json();
+      if (!sessionData.success || sessionData.user.user_type !== "caregiver") {
+        window.location.href = "login.html";
+        return;
+      }
+      stored = sessionData.user;
+      localStorage.setItem("bw_user", JSON.stringify(stored));
+
+      const res  = await fetch(`${API_BASE}/caregiver`, {
+        credentials: "include"
+      });
+      if (res.status === 401) {
+        localStorage.removeItem("bw_user");
+        window.location.href = "login.html";
+        return;
+      }
       const data = await res.json();
 
       if (!data.success) {

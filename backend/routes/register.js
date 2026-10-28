@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db");
 const bcrypt = require("bcrypt");
+const { createSession } = require("../middleware/auth");
 
 router.post("/", async (req, res) => {
   try {
@@ -82,6 +83,11 @@ router.post("/", async (req, res) => {
         [caregiverId, childUserId, child_name, child_age, condition.toLowerCase()]
       );
     }
+
+    await createSession(req, {
+      id: caregiverId,
+      user_type: "caregiver"
+    });
 
     res.json({
       success: true,

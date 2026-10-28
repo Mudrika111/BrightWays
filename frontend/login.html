@@ -48,7 +48,7 @@
       Sign in
     </div>
     <h1>Welcome<br>back</h1>
-    <p>Pick your role and sign in to continue your learning journey.</p>
+    <p id="login-instructions">Children: enter your name and your parent's password.</p>
 
     <div class="role-tabs">
       <button class="role-tab active" id="tab-child"     onclick="setRole('child')">🧒&nbsp; Child</button>
@@ -59,10 +59,10 @@
       <input type="hidden" id="role-input" value="child">
 
       <div class="field">
-        <label for="username">Username</label>
+        <label id="login-name-label" for="username">Child's Name</label>
         <div class="field-wrap">
           <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          <input type="text" id="username" placeholder="your-username" required autocomplete="username">
+          <input type="text" id="username" placeholder="e.g. Alex" required autocomplete="username">
         </div>
       </div>
 
@@ -111,6 +111,14 @@
     document.getElementById('role-input').value = role;
     document.getElementById('tab-child').classList.toggle('active', role === 'child');
     document.getElementById('tab-caregiver').classList.toggle('active', role === 'caregiver');
+    document.getElementById('login-name-label').textContent =
+      role === 'child' ? "Child's Name" : "Parent's Name or Username";
+    document.getElementById('username').placeholder =
+      role === 'child' ? 'e.g. Alex' : 'e.g. Jane Doe';
+    document.getElementById('login-instructions').textContent =
+      role === 'child'
+        ? "Children: enter your name and your parent's password."
+        : "Parents: enter your name or username and your password.";
   }
 
   async function handleLogin(e) {
@@ -137,10 +145,17 @@
     btn.querySelector('svg').style.display = 'none';
 
     try {
-      const res = await fetch('http://localhost:5000/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, role: userRole })
+      const res = await fetch("/api/login", {
+    method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  credentials: "include",
+  body: JSON.stringify({
+    username,
+    password,
+    role: userRole
+  })
       });
 
       const data = await res.json();
@@ -176,7 +191,8 @@
         child_user_id: child_user_id,  // child id (used by activity pages)
         username:      u.username,
         name:          name,
-        condition:     condition
+        condition:     condition,
+        user_type:     u.user_type
       };
 
       localStorage.setItem("bw_user", JSON.stringify(safeUser));
