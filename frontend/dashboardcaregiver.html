@@ -66,10 +66,75 @@
     .mini-fill { height: 100%; border-radius: 99px; transition: width .6s ease; }
     .badge-done { background: #DCFCE7; color: #166534; font-size: .72rem; font-weight: 700; padding: 3px 9px; border-radius: 50px; }
 
+    body { background: #F7F8FC; color: #20233A; }
+    .navbar { padding: 0 max(24px, calc((100vw - 1180px) / 2)); }
+    .content { max-width: 1180px; padding-top: 40px; }
+    .cg-header {
+      padding: 30px 34px;
+      margin-bottom: 26px;
+      border: 1px solid #E8E9F7;
+      border-radius: 22px;
+      background: linear-gradient(115deg, #FFFFFF 0%, #F2F1FF 66%, #EAFBF7 100%);
+      box-shadow: 0 12px 30px rgba(37, 39, 82, .05);
+    }
+    .cg-header h2 { font-size: clamp(1.7rem, 3vw, 2.2rem); letter-spacing: -.5px; }
+    .cg-header p { color: #687087; margin-top: 7px; line-height: 1.6; }
+    .child-tabs { gap: 12px; margin: 0 0 28px; align-items: flex-start; flex-direction: column; }
+    .tabs-label { color: #343852; font-size: .9rem; }
+    #tabs-container { width: 100%; }
+    .ctab {
+      padding: 12px 18px;
+      border-radius: 14px;
+      color: #42465E;
+      box-shadow: 0 3px 10px rgba(37, 39, 82, .04);
+    }
+    .ctab.active { color: white; }
+    .section-heading { margin: 30px 0 14px; }
+    .section-heading h3 { font-family: 'Baloo 2', cursive; font-size: 1.25rem; line-height: 1.25; }
+    .section-heading p { color: #7A8094; font-size: .84rem; margin-top: 4px; }
+    .kpi-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 30px; }
+    .kpi-card {
+      min-height: 138px;
+      padding: 21px 22px;
+      border-color: #EAEBF2;
+      border-radius: 17px;
+      box-shadow: 0 5px 18px rgba(37, 39, 82, .035);
+    }
+    .kpi-label { color: #747B91; font-size: .7rem; }
+    .kpi-val { margin-top: 8px; }
+    .kpi-sub { color: #858BA0; line-height: 1.4; }
+    .charts-grid { grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr); gap: 16px; margin-bottom: 24px; }
+    .chart-card, .table-card {
+      border-color: #EAEBF2;
+      border-radius: 17px;
+      box-shadow: 0 5px 18px rgba(37, 39, 82, .035);
+    }
+    .chart-card { min-height: 300px; padding: 22px 24px; }
+    .chart-card h4, .table-card h4 { font-size: 1.05rem; }
+    .chart-card canvas { max-height: 220px; }
+    .table-card { margin-bottom: 10px; }
+    .table-card h4 { padding: 22px 24px 6px; }
+    .table-scroll { overflow-x: auto; }
+    .table-card table { min-width: 650px; }
+    th { color: #71788E; }
+    td { color: #3D4258; }
+    .empty-row td { line-height: 1.6; }
+
     @media (max-width: 720px) {
       .charts-grid { grid-template-columns: 1fr; }
       .content { padding: 20px 16px 40px; }
       th:nth-child(5), td:nth-child(5) { display: none; }
+      .navbar { padding: 0 16px; }
+      .cg-header { padding: 24px 22px; border-radius: 18px; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+      .kpi-card { min-height: 122px; padding: 16px; }
+      .chart-card { min-height: 260px; padding: 18px; }
+      .child-tabs { margin-bottom: 20px; }
+      #tabs-container { gap: 8px !important; }
+      .ctab { padding: 10px 13px; font-size: .78rem; }
+    }
+    @media (max-width: 380px) {
+      .kpi-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -98,27 +163,31 @@
     <div id="dashboard" style="display:none">
       <div class="cg-header">
         <h2 id="cg-name">Welcome back!</h2>
-        <p id="cg-sub">Here's how your children are progressing today.</p>
+        <p id="cg-sub">A clear view of your child's learning journey.</p>
       </div>
       <div class="child-tabs">
-        <span class="tabs-label">Viewing:</span>
+        <span class="tabs-label">Choose a child profile</span>
         <div id="tabs-container" style="display:flex;gap:10px;flex-wrap:wrap"></div>
+      </div>
+      <div class="section-heading">
+        <h3>Progress at a glance</h3>
+        <p>Learning activity and results for the selected child.</p>
       </div>
       <div class="kpi-grid">
         <div class="kpi-card">
-          <div class="kpi-label">Avg Accuracy</div>
+          <div class="kpi-label">Average score</div>
           <div class="kpi-val" id="kpi-accuracy" style="color:var(--teal)">—</div>
-          <div class="kpi-sub">Across all sessions</div>
+          <div class="kpi-sub">Across recorded sessions</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Total Sessions</div>
+          <div class="kpi-label">Sessions played</div>
           <div class="kpi-val" id="kpi-sessions" style="color:var(--sun)">—</div>
-          <div class="kpi-sub">All time</div>
+          <div class="kpi-sub">All recorded attempts</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-label">Completed</div>
+          <div class="kpi-label">Activities tried</div>
           <div class="kpi-val" id="kpi-completed" style="color:var(--violet)">—</div>
-          <div class="kpi-sub">Unique activities done</div>
+          <div class="kpi-sub">Different activities completed</div>
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Condition</div>
@@ -126,9 +195,13 @@
           <div class="kpi-sub" id="kpi-age"></div>
         </div>
       </div>
+      <div class="section-heading">
+        <h3>Learning patterns</h3>
+        <p>See how scores change and which activities your child has tried.</p>
+      </div>
       <div class="charts-grid">
         <div class="chart-card">
-          <h4>📈 Accuracy Trend — Last 10 Sessions</h4>
+          <h4>📈 Score trend — Last 10 sessions</h4>
           <p id="trend-empty" class="chart-empty" style="display:none;color:var(--muted);text-align:center;padding:35px 0">No sessions recorded yet.</p>
           <canvas id="lineChart" height="180"></canvas>
         </div>
@@ -139,13 +212,13 @@
         </div>
       </div>
       <div class="table-card">
-        <h4>📋 Recent Sessions</h4>
-        <table>
+        <h4>Recent activity</h4>
+        <div class="table-scroll"><table>
           <thead>
             <tr><th>Date</th><th>Activity</th><th>Type</th><th>Score</th><th>Duration</th><th>Status</th></tr>
           </thead>
           <tbody id="sessions-tbody"></tbody>
-        </table>
+        </table></div>
       </div>
     </div>
   </div>
@@ -231,10 +304,10 @@
     document.getElementById("kpi-age").textContent       = child.child_age ? `Age ${child.child_age}` : "";
   }
 
-  function renderTable(sessions) {
+  function renderTable(sessions, childName) {
     const tbody = document.getElementById("sessions-tbody");
     if (!sessions || sessions.length === 0) {
-      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No sessions recorded yet 🎮</td></tr>`;
+      tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No activities are recorded for ${escapeHTML(childName || "this child")} yet. Check that the child is using the account linked to this caregiver.</td></tr>`;
       return;
     }
     tbody.innerHTML = sessions.map(s => {
@@ -261,6 +334,17 @@
     barChart = null;
     const hasTrend = Boolean(trend?.data?.length);
     const hasBreakdown = Boolean(breakdown?.data?.length);
+
+    if (typeof Chart !== "function") {
+      document.getElementById("lineChart").style.display = "none";
+      document.getElementById("barChart").style.display = "none";
+      document.getElementById("trend-empty").textContent = "Charts are unavailable right now.";
+      document.getElementById("activity-empty").textContent = "Charts are unavailable right now.";
+      document.getElementById("trend-empty").style.display = "";
+      document.getElementById("activity-empty").style.display = "";
+      return;
+    }
+
     document.getElementById("lineChart").style.display = hasTrend ? "" : "none";
     document.getElementById("trend-empty").style.display = hasTrend ? "none" : "";
     document.getElementById("barChart").style.display = hasBreakdown ? "" : "none";
@@ -291,7 +375,7 @@
   }
   function renderChild(child) {
     renderKPIs(child);
-    renderTable(child.sessions);
+    renderTable(child.sessions, child.child_name);
     renderCharts(child.accuracy_trend, child.activity_breakdown);
   }
 
@@ -338,8 +422,8 @@
       const cg = data.caregiver;
       document.getElementById("cg-name").textContent = `Welcome back, ${cg.first_name || cg.username}! 👋`;
       document.getElementById("cg-sub").textContent  = data.children.length
-        ? `Here's how your ${data.children.length === 1 ? "child is" : `${data.children.length} children are`} progressing.`
-        : "No child profiles linked yet.";
+        ? `Signed in as @${cg.username}. Here's how your ${data.children.length === 1 ? "child is" : `${data.children.length} children are`} progressing.`
+        : `Signed in as @${cg.username}. No child profiles are linked to this account yet.`;
 
       allChildren = data.children;
 
