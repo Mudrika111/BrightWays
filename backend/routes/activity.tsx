@@ -1,13 +1,14 @@
-const express = require("express");
+import express from "express";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 const router  = express.Router();
-const db      = require("../db");
-const { getActivity } = require("../activityCatalog");
+import db from "../db";
+import { getActivity } from "../activityCatalog";
 
 router.get("/", async (req, res) => {
   try {
     const { type } = req.query;
-    if (!type) return res.status(400).json({ success: false, message: "Missing activity type" });
-    const [rows] = await db.execute(
+    if (typeof type !== "string" || !type) return res.status(400).json({ success: false, message: "Missing activity type" });
+    const [rows] = await db.execute<RowDataPacket[]>(
       "SELECT id, activity_type, title, description, difficulty_level, duration_minutes FROM activities WHERE activity_type = ?",
       [type.toLowerCase()]
     );
@@ -52,7 +53,7 @@ router.post("/", async (req, res) => {
     const score = score_percent;
     const timeSpent = time_spent_seconds;
 
-    const [actRows] = await db.execute(
+    const [actRows] = await db.execute<RowDataPacket[]>(
       `SELECT id
        FROM activities
        WHERE activity_type = ?
@@ -70,7 +71,7 @@ router.post("/", async (req, res) => {
 
     const activity_id = actRows[0].id;
 
-    await db.execute(
+    await db.execute<ResultSetHeader>(
       `INSERT INTO activity_sessions
        (user_id, activity_id, activity_type, activity_key, score_percent, time_spent_seconds)
        VALUES (?, ?, ?, ?, ?, ?)`,
@@ -78,7 +79,7 @@ router.post("/", async (req, res) => {
     );
 
     // Update best score in progress table
-    await db.execute(
+    await db.execute<ResultSetHeader>(
       `INSERT INTO user_activity_progress
        (user_id, activity_id, score, time_spent_seconds, status)
        VALUES (?, ?, ?, ?, 'completed')
@@ -98,4 +99,4 @@ router.post("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

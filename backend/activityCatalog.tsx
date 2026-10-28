@@ -20,4 +20,4 @@ function getActivity(key) {
     : null;
 }
 
-module.exports = { activities, getActivity };
+export { activities, getActivity };

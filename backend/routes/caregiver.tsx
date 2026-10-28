@@ -1,7 +1,8 @@
-const express = require("express");
+import express from "express";
+import type { RowDataPacket } from "mysql2/promise";
 const router = express.Router();
-const db = require("../db");
-const { getActivity } = require("../activityCatalog");
+import db from "../db";
+import { getActivity } from "../activityCatalog";
 
 // GET caregiver dashboard
 router.get("/", async (req, res) => {
@@ -9,7 +10,7 @@ router.get("/", async (req, res) => {
 
   try {
     // 🔹 Verify caregiver
-    const [userRows] = await db.execute(
+    const [userRows] = await db.execute<RowDataPacket[]>(
       `SELECT id, first_name, last_name, username
        FROM users
        WHERE id = ? AND user_type = 'caregiver'`,
@@ -26,7 +27,7 @@ router.get("/", async (req, res) => {
     const caregiver = userRows[0];
 
     // 🔹 Get children
-    const [childrenRows] = await db.execute(
+    const [childrenRows] = await db.execute<RowDataPacket[]>(
       `SELECT id, child_name, child_age, condition_type, child_user_id
        FROM child_profiles
        WHERE caregiver_id = ?
@@ -63,7 +64,7 @@ router.get("/", async (req, res) => {
         const uid = child.child_user_id;
 
         // 🔹 Sessions
-        const [sessions] = await db.execute(
+        const [sessions] = await db.execute<RowDataPacket[]>(
           `SELECT s.completed_at, s.activity_key, s.activity_type,
                   s.score_percent, s.time_spent_seconds
            FROM activity_sessions s
@@ -83,7 +84,7 @@ router.get("/", async (req, res) => {
         }));
 
         // 🔹 Stats
-        const [[stat]] = await db.execute(
+        const [[stat]] = await db.execute<RowDataPacket[]>(
           `SELECT COUNT(*) as total_sessions,
                   AVG(score_percent) as avg_score
            FROM activity_sessions
@@ -91,7 +92,7 @@ router.get("/", async (req, res) => {
           [uid]
         );
 
-        const [[completed]] = await db.execute(
+        const [[completed]] = await db.execute<RowDataPacket[]>(
           `SELECT COUNT(DISTINCT activity_key) as total_completed
            FROM activity_sessions
            WHERE user_id = ? AND activity_key IS NOT NULL`,
@@ -105,7 +106,7 @@ router.get("/", async (req, res) => {
         };
 
         // 🔹 Accuracy trend
-        const [trend] = await db.execute(
+        const [trend] = await db.execute<RowDataPacket[]>(
           `SELECT score_percent, completed_at
            FROM activity_sessions
            WHERE user_id = ?
@@ -123,7 +124,7 @@ router.get("/", async (req, res) => {
         };
 
         // 🔹 Activity breakdown
-        const [breakdown] = await db.execute(
+        const [breakdown] = await db.execute<RowDataPacket[]>(
           `SELECT activity_key, activity_type, COUNT(*) as cnt
            FROM activity_sessions
            WHERE user_id = ?
@@ -157,4 +158,4 @@ router.get("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

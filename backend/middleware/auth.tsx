@@ -1,4 +1,6 @@
-function requireAuth(req, res, next) {
+import type { NextFunction, Request, Response } from "express";
+
+function requireAuth(req: Request, res: Response, next: NextFunction) {
   if (!req.session || !req.session.user) {
     return res.status(401).json({
       success: false,
@@ -9,7 +11,7 @@ function requireAuth(req, res, next) {
   next();
 }
 
-function requireRole(role) {
+function requireRole(role: "child" | "caregiver") {
   return (req, res, next) => {
     if (req.session.user.user_type !== role) {
       return res.status(403).json({
@@ -22,8 +24,8 @@ function requireRole(role) {
   };
 }
 
-function createSession(req, user) {
-  return new Promise((resolve, reject) => {
+function createSession(req: Request, user: { id: number; user_type: "child" | "caregiver" }) {
+  return new Promise<void>((resolve, reject) => {
     req.session.regenerate((regenerateError) => {
       if (regenerateError) {
         return reject(regenerateError);
@@ -45,4 +47,4 @@ function createSession(req, user) {
   });
 }
 
-module.exports = { requireAuth, requireRole, createSession };
+export { requireAuth, requireRole, createSession };

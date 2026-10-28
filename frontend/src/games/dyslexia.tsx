@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════
    SHARED SETUP
 ═══════════════════════════════════════════════════════════════ */
-const API_URL       = "/api/activity";
+const API_URL = "/api/activity";
 let CARD_KEY      = new URLSearchParams(window.location.search).get("card") || "bw_done_dyslexia_phonics";
 
 async function saveAndFinish(score, total) {
@@ -74,10 +74,10 @@ function initPhonics() {
   }
 
   window.phonicsCheck = function(choice, btn, answer) {
-    document.querySelectorAll(".opt").forEach(b => b.disabled = true);
+    document.querySelectorAll<HTMLButtonElement>(".opt").forEach(b => b.disabled = true);
     if (choice === answer) { score++; btn.classList.add("correct"); }
     else btn.classList.add("wrong");
-    document.getElementById("score").textContent = score;
+    document.getElementById("score").textContent = String(score);
     index++;
     setTimeout(show, 1000);
   };
@@ -143,7 +143,7 @@ function initWordMatch() {
       matchedCount++;
       imgEl.classList.add("matched");
       wordEl.classList.add("matched");
-      document.getElementById("wm-score").textContent = score;
+      document.getElementById("wm-score").textContent = String(score);
       selectedImg = null;
       if (matchedCount >= PAIRS.length) setTimeout(() => saveAndFinish(score, PAIRS.length), 600);
     } else {
@@ -196,10 +196,10 @@ function initRhymeTime() {
   }
 
   window.rtCheck = function(choice, btn, answer) {
-    document.querySelectorAll(".rt-opt").forEach(b => b.disabled = true);
+    document.querySelectorAll<HTMLButtonElement>(".rt-opt").forEach(b => b.disabled = true);
     if (choice === answer) { score++; btn.classList.add("correct"); }
     else btn.classList.add("wrong");
-    document.getElementById("rt-score").textContent = score;
+    document.getElementById("rt-score").textContent = String(score);
     index++;
     setTimeout(show, 1000);
   };
@@ -245,10 +245,10 @@ function initLetterSounds() {
   }
 
   window.lsCheck = function(choice, btn, answer) {
-    document.querySelectorAll(".ls-opt").forEach(b => b.disabled = true);
+    document.querySelectorAll<HTMLButtonElement>(".ls-opt").forEach(b => b.disabled = true);
     if (choice === answer) { score++; btn.classList.add("correct"); }
     else btn.classList.add("wrong");
-    document.getElementById("ls-score").textContent = score;
+    document.getElementById("ls-score").textContent = String(score);
     index++;
     setTimeout(show, 1000);
   };

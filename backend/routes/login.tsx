@@ -1,9 +1,10 @@
 
-const express = require("express");
+import express from "express";
+import type { RowDataPacket } from "mysql2/promise";
 const router = express.Router();
-const db = require("../db");
-const bcrypt = require("bcrypt");
-const { createSession } = require("../middleware/auth");
+import db from "../db";
+import bcrypt from "bcrypt";
+import { createSession } from "../middleware/auth";
 
 router.post("/", async (req, res) => {
   try {
@@ -22,7 +23,7 @@ router.post("/", async (req, res) => {
       });
     }
 
-    const [users] = await db.execute(
+    const [users] = await db.execute<RowDataPacket[]>(
       `SELECT id, username, email, password, user_type, first_name
        FROM users
        WHERE user_type = ?
@@ -56,7 +57,7 @@ router.post("/", async (req, res) => {
 
     // Load the child's profile for the authenticated account.
     if (user.user_type === "caregiver") {
-      const [profiles] = await db.execute(
+      const [profiles] = await db.execute<RowDataPacket[]>(
         `SELECT * FROM child_profiles
          WHERE caregiver_id = ?
          LIMIT 1`,
@@ -74,7 +75,7 @@ router.post("/", async (req, res) => {
         });
       }
     } else {
-      const [profiles] = await db.execute(
+      const [profiles] = await db.execute<RowDataPacket[]>(
         `SELECT * FROM child_profiles
          WHERE child_user_id = ?
          LIMIT 1`,
@@ -114,4 +115,4 @@ router.post("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

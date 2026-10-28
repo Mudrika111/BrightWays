@@ -9,9 +9,9 @@ import caregiverStyles from "./styles/dashboardcaregiver.css?inline";
 import adhdStyles from "./styles/activityadhd.css?inline";
 import autismStyles from "./styles/activityautism.css?inline";
 import dyslexiaStyles from "./styles/activitydyxlexia.css?inline";
-import { startActivityGame as startAdhdGame } from "./games/adhd.js";
-import { startActivityGame as startAutismGame } from "./games/autism.js";
-import { startActivityGame as startDyslexiaGame } from "./games/dyslexia.js";
+import { startActivityGame as startAdhdGame } from "./games/adhd";
+import { startActivityGame as startAutismGame } from "./games/autism";
+import { startActivityGame as startDyslexiaGame } from "./games/dyslexia";
 
 const pageName = window.location.pathname.split("/").pop() || "index.html";
 const stylesByPage = {
@@ -392,7 +392,7 @@ const activitiesByCondition = {
     ["📖", "Story Time", 2, "Social", "tag-teal", "c-teal", "activityautism.html", "bw_done_autism_story"],
     ["🎨", "Sort & Match", 1, "Visual", "tag-sky", "c-sky", "activityautism.html", "bw_done_autism_sort"]
   ]
-};
+} as const;
 
 function normalizeCondition(value) {
   if (typeof value !== "string") return null;
@@ -536,7 +536,7 @@ function CaregiverDashboard() {
         <div className="table-card"><h4>Recent activity</h4><div className="table-scroll"><table><thead><tr><th>Date</th><th>Activity</th><th>Type</th><th>Score</th><th>Duration</th><th>Status</th></tr></thead><tbody>{sessions.length ? sessions.map((session, index) => {
           const score = Math.max(0, Math.min(Number(session.score) || 0, 100));
           return <tr key={session.id || `${session.date}-${index}`}><td>{session.date}</td><td>{session.activity}</td><td>{session.type}</td><td><div className="mini-bar"><div className="mini-track"><div className="mini-fill" style={{ width: `${score}%`, background: score >= 80 ? "var(--teal)" : score >= 60 ? "#F59E0B" : "var(--rose)" }} /></div><span>{score}%</span></div></td><td>{session.time}</td><td><span className="badge-done">✓ Done</span></td></tr>;
-        }) : <tr className="empty-row"><td colSpan="6">{activeChild ? `No activities are recorded for ${activeChild.child_name || "this child"} yet. Check that the child is using the account linked to this caregiver.` : "No sessions yet."}</td></tr>}</tbody></table></div></div>
+        }) : <tr className="empty-row"><td colSpan={6}>{activeChild ? `No activities are recorded for ${activeChild.child_name || "this child"} yet. Check that the child is using the account linked to this caregiver.` : "No sessions yet."}</td></tr>}</tbody></table></div></div>
       </div></main>
     </>
   );

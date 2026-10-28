@@ -1,11 +1,12 @@
-const express = require("express");
+import express from "express";
+import type { RowDataPacket } from "mysql2/promise";
 const router = express.Router();
-const db = require("../db");
-const { requireAuth } = require("../middleware/auth");
+import db from "../db";
+import { requireAuth } from "../middleware/auth";
 
 router.get("/", requireAuth, async (req, res) => {
   try {
-    const [users] = await db.execute(
+    const [users] = await db.execute<RowDataPacket[]>(
       `SELECT id, username, email, first_name, last_name, user_type
        FROM users
        WHERE id = ?
@@ -23,7 +24,7 @@ router.get("/", requireAuth, async (req, res) => {
 
     let childProfile = null;
     if (user.user_type === "caregiver") {
-      const [profiles] = await db.execute(
+      const [profiles] = await db.execute<RowDataPacket[]>(
         `SELECT * FROM child_profiles
          WHERE caregiver_id = ?
          LIMIT 1`,
@@ -31,7 +32,7 @@ router.get("/", requireAuth, async (req, res) => {
       );
       childProfile = profiles[0] || null;
     } else if (user.user_type === "child") {
-      const [profiles] = await db.execute(
+      const [profiles] = await db.execute<RowDataPacket[]>(
         `SELECT * FROM child_profiles
          WHERE child_user_id = ?
          LIMIT 1`,
@@ -93,4 +94,4 @@ router.post("/logout", (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

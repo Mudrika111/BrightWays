@@ -1,12 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════
    SHARED SETUP
 ═══════════════════════════════════════════════════════════════ */
-const API_URL       = "/api/activity";
+const API_URL = "/api/activity";
 let CARD_KEY      = new URLSearchParams(window.location.search).get("card") || "bw_done_adhd_memory";
 
 let startTime = Date.now();
 
-async function saveAndFinish(score, total, modalTitle) {
+async function saveAndFinish(score, total, modalTitle = "") {
   const timeSpent = Math.round((Date.now() - startTime) / 1000);
   const percent   = total > 0 ? Math.round((score / total) * 100) : 100;
   if (modalTitle) document.getElementById("modal-title").textContent = modalTitle;
@@ -65,7 +65,7 @@ function initMemoryMatch() {
   ];
 
   let score = 0, index = 0, timer;
-  document.getElementById("total").textContent = QUESTIONS.length;
+  document.getElementById("total").textContent = String(QUESTIONS.length);
 
   function show() {
     if (index >= QUESTIONS.length) return saveAndFinish(score, QUESTIONS.length);
@@ -73,12 +73,12 @@ function initMemoryMatch() {
     document.getElementById("seq-opts").innerHTML = "";
     document.getElementById("mem-row").innerHTML = q.seq.map(e => `<div class="mem-tile">${e}</div>`).join("");
     let t = 5;
-    document.getElementById("timer-val").textContent = t;
+    document.getElementById("timer-val").textContent = String(t);
     document.getElementById("timer-fill").style.width = "100%";
     clearInterval(timer);
     timer = setInterval(() => {
       t--;
-      document.getElementById("timer-val").textContent = t;
+      document.getElementById("timer-val").textContent = String(t);
       document.getElementById("timer-fill").style.width = (t / 5 * 100) + "%";
       if (t <= 0) { clearInterval(timer); hide(q); }
     }, 1000);
@@ -92,9 +92,9 @@ function initMemoryMatch() {
   }
 
   window.mmCheck = function(chosen, answer) {
-    document.querySelectorAll(".seq-opt").forEach(b => b.disabled = true);
+    document.querySelectorAll<HTMLButtonElement>(".seq-opt").forEach(b => b.disabled = true);
     if (chosen === answer) score++;
-    document.getElementById("score").textContent = score;
+    document.getElementById("score").textContent = String(score);
     index++;
     setTimeout(show, 1000);
   };
@@ -150,7 +150,7 @@ function initQuickRecall() {
     if (cards[a].emoji === cards[b].emoji) {
       cards[a].matched = cards[b].matched = true;
       pairsFound++;
-      document.getElementById("qr-pairs").textContent = pairsFound;
+      document.getElementById("qr-pairs").textContent = String(pairsFound);
       flipped = [];
       locked  = false;
       render();
@@ -158,7 +158,7 @@ function initQuickRecall() {
     } else {
       // Flash wrong then flip back
       setTimeout(() => {
-        const tiles = document.querySelectorAll(".qr-tile");
+        const tiles = document.querySelectorAll<HTMLElement>(".qr-tile");
         [a, b].forEach(idx => tiles[idx] && tiles[idx].classList.add("wrong-flash"));
         setTimeout(() => {
           flipped = [];
@@ -232,16 +232,16 @@ function initSpotTheDiff() {
   }
 
   window.stdCheck = function(tapped, correctIdx) {
-    document.querySelectorAll("#std-b .std-cell").forEach(c => {
+    document.querySelectorAll<HTMLElement>("#std-b .std-cell").forEach(c => {
       c.classList.remove("clickable");
       c.onclick = null;
     });
-    const cells = document.querySelectorAll("#std-b .std-cell");
+    const cells = document.querySelectorAll<HTMLElement>("#std-b .std-cell");
     if (tapped === correctIdx) {
       score++;
       cells[tapped].classList.add("correct-diff");
       document.getElementById("std-found").textContent = "✅ Found it!";
-      document.getElementById("std-score").textContent = score;
+      document.getElementById("std-score").textContent = String(score);
     } else {
       cells[tapped].classList.add("wrong-diff");
       cells[correctIdx].classList.add("correct-diff");
@@ -304,12 +304,12 @@ function initNumberDash() {
     document.getElementById("nd-feedback").textContent = "";
 
     let t = 3;
-    document.getElementById("nd-timer").textContent = t;
+    document.getElementById("nd-timer").textContent = String(t);
     document.getElementById("nd-fill").style.width  = "100%";
     clearInterval(timer);
     timer = setInterval(() => {
       t--;
-      document.getElementById("nd-timer").textContent = t;
+      document.getElementById("nd-timer").textContent = String(t);
       document.getElementById("nd-fill").style.width  = (t / 3 * 100) + "%";
       if (t <= 0) { clearInterval(timer); hideNumber(n); }
     }, 1000);
@@ -337,7 +337,7 @@ function initNumberDash() {
   };
 
   function ndSubmit() {
-    document.querySelectorAll(".nd-key").forEach(b => b.disabled = true);
+    document.querySelectorAll<HTMLButtonElement>(".nd-key").forEach(b => b.disabled = true);
     const correct = window._ndCorrect;
     if (answer === correct) {
       score++;
@@ -347,10 +347,10 @@ function initNumberDash() {
       document.getElementById("nd-feedback").textContent = `❌ It was ${correct}`;
       document.getElementById("nd-feedback").style.color = "#FF6584";
     }
-    document.getElementById("nd-score").textContent = score;
+    document.getElementById("nd-score").textContent = String(score);
     index++;
     setTimeout(() => {
-      document.querySelectorAll(".nd-key").forEach(b => b.disabled = false);
+      document.querySelectorAll<HTMLButtonElement>(".nd-key").forEach(b => b.disabled = false);
       showNumber();
     }, 1200);
   }

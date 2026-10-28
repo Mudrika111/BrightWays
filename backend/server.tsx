@@ -1,15 +1,23 @@
 
-require("dotenv").config();
+import "dotenv/config";
 
-const express = require("express");
-const session = require("express-session");
-const MySQLStore = require("express-mysql-session")(session);
-const path = require("path");
-const db = require("./db");
+import express from "express";
+import session from "express-session";
+import MySQLStoreFactory from "express-mysql-session";
+import path from "path";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import db from "./db";
+import { requireAuth, requireRole } from "./middleware/auth";
+import activityRouter from "./routes/activity";
+import caregiverRouter from "./routes/caregiver";
+import dashboardRouter from "./routes/dashboard";
+import loginRouter from "./routes/login";
+import registerRouter from "./routes/register";
+import sessionRouter from "./routes/session";
 
 const app = express();
+const MySQLStore = MySQLStoreFactory(session);
 const PORT = process.env.PORT || 5000;
-const { requireAuth, requireRole } = require("./middleware/auth");
 
 // Require a session secret instead of using a predictable default.
 if (!process.env.SESSION_SECRET) {
@@ -47,16 +55,16 @@ app.use(
 );
 
 // Serve the React production build from the same origin.
-const frontendPath = path.join(__dirname, "../frontend/dist");
+const frontendPath = path.join(__dirname, "../../frontend/dist");
 app.use(express.static(frontendPath));
 
 // API routes
-app.use("/api/activity", requireAuth, requireRole("child"), require("./routes/activity"));
-app.use("/api/caregiver", requireAuth, requireRole("caregiver"), require("./routes/caregiver"));
-app.use("/api/dashboard", requireAuth, requireRole("child"), require("./routes/dashboard"));
-app.use("/api/login", require("./routes/login"));
-app.use("/api/register", require("./routes/register"));
-app.use("/api/session", require("./routes/session"));
+app.use("/api/activity", requireAuth, requireRole("child"), activityRouter);
+app.use("/api/caregiver", requireAuth, requireRole("caregiver"), caregiverRouter);
+app.use("/api/dashboard", requireAuth, requireRole("child"), dashboardRouter);
+app.use("/api/login", loginRouter);
+app.use("/api/register", registerRouter);
+app.use("/api/session", sessionRouter);
 
 // Do not mount /api/caregiver a second time.
 app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
@@ -64,7 +72,7 @@ app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
 });
 
 async function startServer() {
-  await db.execute(
+  await db.execute<ResultSetHeader>(
     `CREATE TABLE IF NOT EXISTS activity_sessions (
       id INT PRIMARY KEY AUTO_INCREMENT,
       user_id INT NOT NULL,
@@ -81,11 +89,11 @@ async function startServer() {
     )`
   );
 
-  const [columns] = await db.execute(
+  const [columns] = await db.execute<RowDataPacket[]>(
     "SHOW COLUMNS FROM activity_sessions LIKE 'activity_key'"
   );
   if (columns.length === 0) {
-    await db.execute(
+    await db.execute<ResultSetHeader>(
       "ALTER TABLE activity_sessions ADD COLUMN activity_key VARCHAR(80) DEFAULT NULL"
     );
   }

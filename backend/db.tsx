@@ -1,7 +1,7 @@
 
-require("dotenv").config();
+import "dotenv/config";
 
-const mysql = require("mysql2/promise");
+import mysql from "mysql2/promise";
 
 console.log("DB_HOST:", process.env.DB_HOST);
 console.log("DB_PORT:", process.env.DB_PORT);
@@ -16,4 +16,4 @@ const db = mysql.createPool({
   port: Number(process.env.DB_PORT),
 });
 
-module.exports = db;
+export default db;

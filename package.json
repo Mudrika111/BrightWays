@@ -2,8 +2,9 @@
   "name": "brightways",
   "private": true,
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "vite build",
+    "dev": "vite --config vite.config.tsx --host 0.0.0.0",
+    "build": "tsc -p backend/tsconfig.json && vite build --config vite.config.tsx",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p backend/tsconfig.json",
     "start": "npm run build && npm --prefix backend run start:server"
   },
   "dependencies": {
@@ -12,6 +13,10 @@
     "react-dom": "^19.1.0"
   },
   "devDependencies": {
+    "@types/node": "^22.15.30",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "^5.8.3",
     "vite": "^6.3.5"
   }
 }

@@ -1,12 +1,13 @@
-const express = require("express");
+import express from "express";
+import type { RowDataPacket } from "mysql2/promise";
 const router  = express.Router();
-const db      = require("../db");
+import db from "../db";
 
 router.get("/", async (req, res) => {
   try {
     const user_id = req.session.user.id;
 
-    const [[user]] = await db.execute(
+    const [[user]] = await db.execute<RowDataPacket[]>(
       `SELECT id, username, first_name, last_name, user_type
        FROM users
        WHERE id = ? AND user_type = 'child'`,
@@ -14,7 +15,7 @@ router.get("/", async (req, res) => {
     );
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    const [completed] = await db.execute(
+    const [completed] = await db.execute<RowDataPacket[]>(
       `SELECT DISTINCT activity_key
        FROM activity_sessions
        WHERE user_id = ?
@@ -35,4 +36,4 @@ router.get("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

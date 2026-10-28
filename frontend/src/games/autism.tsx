@@ -1,12 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════
    SHARED SETUP
 ═══════════════════════════════════════════════════════════════ */
-const API_URL       = "/api/activity";
+const API_URL = "/api/activity";
 let CARD_KEY      = new URLSearchParams(window.location.search).get("card") || "bw_done_autism_routine";
 
 let startTime = Date.now();
 
-async function saveAndFinish(score, total, modalTitle) {
+async function saveAndFinish(score, total, modalTitle = "") {
   const timeSpent = Math.round((Date.now() - startTime) / 1000);
   const percent   = total > 0 ? Math.round((score / total) * 100) : 100;
   if (modalTitle) document.getElementById("modal-title").textContent = modalTitle;
@@ -63,7 +63,7 @@ function initRoutine() {
   let index = 0;
 
   function render() {
-    document.getElementById("step").textContent = index + 1;
+    document.getElementById("step").textContent = String(index + 1);
     document.getElementById("wrap").innerHTML = ROUTINE.map((r, i) => `
       <div class="sched-step ${i < index ? 'done' : i === index ? 'active' : ''}" onclick="routineTap(${i})">
         <div>${r.icon}</div><div>${r.label}</div>
@@ -161,10 +161,10 @@ function initFeelings() {
   }
 
   window.feelCheck = function(choice, btn, answer) {
-    document.querySelectorAll(".feel-opt").forEach(b => b.disabled = true);
+    document.querySelectorAll<HTMLButtonElement>(".feel-opt").forEach(b => b.disabled = true);
     if (choice === answer) { score++; btn.classList.add("correct"); }
     else btn.classList.add("wrong");
-    document.getElementById("feel-score").textContent = score;
+    document.getElementById("feel-score").textContent = String(score);
     index++;
     setTimeout(show, 1100);
   };
@@ -245,10 +245,10 @@ function initStoryTime() {
   }
 
   window.storyCheck = function(btn, choice, answer) {
-    document.querySelectorAll(".story-opt").forEach(b => b.disabled = true);
+    document.querySelectorAll<HTMLButtonElement>(".story-opt").forEach(b => b.disabled = true);
     if (choice === answer) { score++; btn.classList.add("correct"); }
     else btn.classList.add("wrong");
-    document.getElementById("st-score").textContent = score;
+    document.getElementById("st-score").textContent = String(score);
     index++;
     setTimeout(show, 1200);
   };

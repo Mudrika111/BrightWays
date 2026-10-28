@@ -1,8 +1,9 @@
-const express = require("express");
+import express from "express";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 const router = express.Router();
-const db = require("../db");
-const bcrypt = require("bcrypt");
-const { createSession } = require("../middleware/auth");
+import db from "../db";
+import bcrypt from "bcrypt";
+import { createSession } from "../middleware/auth";
 
 router.post("/", async (req, res) => {
   try {
@@ -27,7 +28,7 @@ router.post("/", async (req, res) => {
     const last_name  = nameParts.slice(1).join(" ");
 
     // Check caregiver username/email uniqueness
-    const [exists] = await db.execute(
+    const [exists] = await db.execute<RowDataPacket[]>(
       "SELECT id FROM users WHERE username=? OR email=?",
       [username, email]
     );
@@ -36,7 +37,7 @@ router.post("/", async (req, res) => {
     }
 
     // 1. Create caregiver account
-    const [result] = await db.execute(
+    const [result] = await db.execute<ResultSetHeader>(
       `INSERT INTO users (username, email, password, user_type, first_name, last_name)
        VALUES (?, ?, ?, 'caregiver', ?, ?)`,
       [username, email, hashed, first_name, last_name]
@@ -51,7 +52,7 @@ router.post("/", async (req, res) => {
       const childEmail    = childUsername + "@brightways.local";
 
       // Make username unique if it already exists
-      const [childExists] = await db.execute(
+      const [childExists] = await db.execute<RowDataPacket[]>(
         "SELECT id FROM users WHERE username=? OR email=?",
         [childUsername, childEmail]
       );
@@ -61,14 +62,14 @@ router.post("/", async (req, res) => {
         const uniqueUsername = childUsername + "_" + caregiverId;
         const uniqueEmail    = uniqueUsername + "@brightways.local";
 
-        const [childResult] = await db.execute(
+        const [childResult] = await db.execute<ResultSetHeader>(
           `INSERT INTO users (username, email, password, user_type, first_name)
            VALUES (?, ?, ?, 'child', ?)`,
           [uniqueUsername, uniqueEmail, hashed, child_name]
         );
         childUserId = childResult.insertId;
       } else {
-        const [childResult] = await db.execute(
+        const [childResult] = await db.execute<ResultSetHeader>(
           `INSERT INTO users (username, email, password, user_type, first_name)
            VALUES (?, ?, ?, 'child', ?)`,
           [childUsername, childEmail, hashed, child_name]
@@ -77,7 +78,7 @@ router.post("/", async (req, res) => {
       }
 
       // 3. Create child_profile linked to both caregiver AND child user
-      await db.execute(
+      await db.execute<ResultSetHeader>(
         `INSERT INTO child_profiles (caregiver_id, child_user_id, child_name, child_age, condition_type)
          VALUES (?, ?, ?, ?, ?)`,
         [caregiverId, childUserId, child_name, child_age, condition.toLowerCase()]
@@ -108,4 +109,4 @@ router.post("/", async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
