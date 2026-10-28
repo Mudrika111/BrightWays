@@ -46,8 +46,8 @@ app.use(
   })
 );
 
-// Serve the existing frontend from the same origin.
-const frontendPath = path.join(__dirname, "../frontend");
+// Serve the React production build from the same origin.
+const frontendPath = path.join(__dirname, "../frontend/dist");
 app.use(express.static(frontendPath));
 
 // API routes
@@ -59,6 +59,9 @@ app.use("/api/register", require("./routes/register"));
 app.use("/api/session", require("./routes/session"));
 
 // Do not mount /api/caregiver a second time.
+app.get(/^(?!\/api(?:\/|$)).*/, (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"));
+});
 
 async function startServer() {
   await db.execute(

@@ -1,0 +1,38 @@
+body { display: flex; flex-direction: column; min-height: 100vh; }
+    main { background: linear-gradient(160deg, #FFF7ED, #FFFBEB); flex: 1; display: flex; }
+
+    /* ── Shared game styles ── */
+    .word { text-align: center; font-size: 3rem; margin: 20px 0; font-weight: bold; }
+    .opts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .opt  { padding: 20px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.5rem; cursor: pointer; background: white; }
+    .opt.correct { background: #dcfce7; border-color: #22c55e; }
+    .opt.wrong   { background: #fee2e2; border-color: #ef4444; }
+    .save-status { text-align:center; margin-top:10px; font-size:.85rem; color: var(--muted); }
+
+    /* ── Word Match styles ── */
+    .wm-pair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .wm-col { display: flex; flex-direction: column; gap: 10px; }
+    .wm-item { padding: 14px 18px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.1rem; font-weight: 700; cursor: pointer; background: white; text-align: center; transition: .15s; }
+    .wm-item.selected   { border-color: #6C63FF; background: #EFEEFD; }
+    .wm-item.matched    { border-color: #22c55e; background: #dcfce7; opacity: .7; pointer-events: none; }
+    .wm-item.wrong-flash{ border-color: #ef4444; background: #fee2e2; }
+    .wm-img { font-size: 2rem; }
+    .wm-word { font-size: 1rem; }
+
+    /* ── Rhyme Time styles ── */
+    .rt-word { font-family: 'Baloo 2', cursive; font-size: 3rem; font-weight: 800; text-align: center; margin: 16px 0 8px; color: #FF9500; }
+    .rt-instruction { text-align: center; font-size: .95rem; color: var(--muted); margin-bottom: 14px; }
+    .rt-opts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .rt-opt { padding: 18px; border: 2px solid #ddd; border-radius: 10px; font-size: 1.3rem; font-weight: 700; cursor: pointer; background: white; text-align: center; }
+    .rt-opt.correct { background: #dcfce7; border-color: #22c55e; }
+    .rt-opt.wrong   { background: #fee2e2; border-color: #ef4444; }
+
+    /* ── Letter Sounds styles ── */
+    .ls-letter { font-family: 'Baloo 2', cursive; font-size: 5rem; font-weight: 800; text-align: center; margin: 10px 0; line-height: 1; }
+    .ls-prompt { text-align: center; font-size: .95rem; color: var(--muted); margin-bottom: 14px; }
+    .ls-opts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .ls-opt { padding: 16px 10px; border: 2px solid #ddd; border-radius: 10px; cursor: pointer; background: white; text-align: center; transition: .15s; }
+    .ls-opt .ls-emoji { font-size: 2rem; display: block; margin-bottom: 4px; }
+    .ls-opt .ls-word  { font-size: .9rem; font-weight: 700; }
+    .ls-opt.correct { background: #dcfce7; border-color: #22c55e; }
+    .ls-opt.wrong   { background: #fee2e2; border-color: #ef4444; }

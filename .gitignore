@@ -1,5 +1,6 @@
 node_modules
 backend/node_modules
+frontend/dist
 .env
 backend/.env
 .vscode

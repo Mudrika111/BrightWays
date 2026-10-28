@@ -1,0 +1,49 @@
+body { display: flex; flex-direction: column; min-height: 100vh; }
+    main { background: linear-gradient(160deg, #F0F9FF, #EFF0FF); flex: 1; display: flex; }
+
+    /* ── Shared ── */
+    .save-status { text-align:center; margin-top:10px; font-size:.85rem; color: var(--muted); }
+    .timer-row   { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+    .timer-count { font-family: 'Baloo 2', cursive; font-size: 1.5rem; font-weight: 800; color: var(--sun); min-width: 64px; }
+    .timer-track { flex: 1; background: var(--border); border-radius: 99px; height: 12px; overflow: hidden; }
+    .timer-fill  { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--teal), var(--sky)); transition: width 1s linear; }
+
+    /* ── Memory Match (original) ── */
+    .mem-row  { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 18px 0; }
+    .mem-tile { width: 70px; height: 70px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: #E0F4FD; border: 2px solid #B5D4F4; }
+    .mem-tile.hidden { background: #6C63FF; border-color: #6C63FF; color: #6C63FF; }
+    .seq-opts { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .seq-opt  { padding: 13px 18px; border-radius: 10px; border: 2px solid #E5E7EB; background: white; font-weight: 700; cursor: pointer; }
+    .seq-opt.correct { border-color: #00B894; background: #E6F9F5; }
+    .seq-opt.wrong   { border-color: #FF6584; background: #FFF0F3; }
+
+    /* ── Quick Recall ── */
+    .qr-grid   { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0; }
+    .qr-tile   { aspect-ratio: 1; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; background: #E0F4FD; border: 2px solid #B5D4F4; transition: .15s; }
+    .qr-tile.hidden   { background: #6C63FF; border-color: #6C63FF; color: #6C63FF; cursor: pointer; }
+    .qr-tile.revealed { background: #E0F4FD; border-color: #B5D4F4; cursor: pointer; }
+    .qr-tile.matched  { background: #dcfce7; border-color: #22c55e; cursor: default; opacity: .7; }
+    .qr-tile.wrong-flash { background: #fee2e2; border-color: #ef4444; }
+    .qr-info  { text-align: center; font-size: .88rem; color: var(--muted); margin-bottom: 6px; }
+
+    /* ── Spot the Diff ── */
+    .std-panels  { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0 14px; }
+    .std-panel   { border: 2px solid #ddd; border-radius: 12px; padding: 10px; background: white; }
+    .std-label   { font-size: .72rem; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); text-align: center; margin-bottom: 8px; }
+    .std-grid    { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+    .std-cell    { aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; background: #f9fafb; border: 2px solid transparent; cursor: pointer; transition: .15s; }
+    .std-cell.clickable:hover { border-color: #6C63FF; background: #EFEEFD; }
+    .std-cell.correct-diff    { border-color: #22c55e; background: #dcfce7; }
+    .std-cell.wrong-diff      { border-color: #ef4444; background: #fee2e2; }
+    .std-hint    { text-align: center; font-size: .85rem; color: #555; margin-bottom: 4px; }
+    .std-found   { text-align: center; font-weight: 700; font-size: .88rem; color: var(--teal); min-height: 20px; }
+
+    /* ── Number Dash ── */
+    .nd-display  { font-family: 'Baloo 2', cursive; font-size: 3.5rem; font-weight: 800; text-align: center; color: #0EA5E9; margin: 10px 0 4px; letter-spacing: 6px; }
+    .nd-prompt   { text-align: center; font-size: .9rem; color: var(--muted); margin-bottom: 14px; }
+    .nd-keypad   { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 260px; margin: 0 auto; }
+    .nd-key      { padding: 16px; border: 2px solid #ddd; border-radius: 12px; font-family: 'Baloo 2', cursive; font-size: 1.4rem; font-weight: 800; background: white; cursor: pointer; text-align: center; transition: .12s; }
+    .nd-key:hover { border-color: #0EA5E9; background: #E0F4FD; }
+    .nd-key.del  { font-size: 1rem; color: #FF6584; }
+    .nd-answer   { font-family: 'Baloo 2', cursive; font-size: 2rem; font-weight: 800; text-align: center; letter-spacing: 4px; min-height: 48px; color: #1a1a2e; margin: 10px 0 6px; border-bottom: 3px solid #ddd; padding-bottom: 4px; }
+    .nd-feedback { text-align: center; font-weight: 700; font-size: .9rem; min-height: 22px; }

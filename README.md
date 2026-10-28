@@ -9,7 +9,7 @@ BrightWays delivers tailored learning activities with real-time progress monitor
 ## How It's Made
 
 **Backend**: Node.js, Express.js, Bcrypt, Socket.io  
-**Frontend**: HTML5, CSS3, JavaScript  
+**Frontend**: React, Vite, CSS
 **Database**: MySQL with normalized schema  
 
 **Core entities**: Users (child/caregiver), Activities, Progress tracking, Sessions, Child profiles
@@ -19,6 +19,12 @@ BrightWays delivers tailored learning activities with real-time progress monitor
 The backend stores authenticated sessions in MySQL and sends the browser an HTTP-only `bw.sid` cookie. Set a strong, private `SESSION_SECRET` in `backend/.env` before starting the server. Login and registration create a session; `GET /api/session` checks it and `POST /api/session/logout` ends it.
 
 Activity, child-dashboard, and caregiver-dashboard APIs require a valid session and the matching account role. They use the account ID from the session rather than trusting IDs sent by the browser. Serve the frontend from the same origin as the backend so the browser sends the session cookie with API requests.
+
+## Frontend development
+
+The React app keeps the existing `.html` page URLs and styles. From the project root, run `npm install` once and use `npm run dev` for Vite development. Vite forwards `/api` requests to the backend at `http://localhost:5000`; start the backend separately with `npm start` in `backend`.
+
+For production, `npm run build` creates `frontend/dist`. Starting the backend with `npm start` builds the frontend first, then serves that build and routes the existing page URLs to the React app.
 
 Dashboard completion and caregiver activity history use the activity card selected by the child. The backend creates `activity_sessions` when it starts and adds the `activity_key` column to older versions of that table; historical records without that key are shown as previous activities because their exact card cannot be determined. When running `backend/table.sql` manually, select the database configured by `DB_NAME` in `backend/.env` first.
 
