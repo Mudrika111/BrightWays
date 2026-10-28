@@ -1,5 +1,4 @@
--- Create Database
-USE defaultdb;
+-- Select the database configured by DB_NAME in backend/.env before running this file.
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
@@ -58,6 +57,14 @@ CREATE TABLE IF NOT EXISTS activity_sessions (
     INDEX idx_user_sessions (user_id),
     INDEX idx_user_type_sessions (user_id, activity_type)
 );
+
+-- MySQL session store used by express-mysql-session
+CREATE TABLE IF NOT EXISTS sessions (
+    session_id VARCHAR(128) COLLATE utf8mb4_bin NOT NULL,
+    expires INT UNSIGNED NOT NULL,
+    data MEDIUMTEXT COLLATE utf8mb4_bin,
+    PRIMARY KEY (session_id)
+) ENGINE=InnoDB;
 
 -- Caregiver -> child profile mapping
 -- child_user_id links to users.id when the child also has an account (optional)

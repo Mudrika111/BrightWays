@@ -61,6 +61,23 @@ app.use("/api/session", require("./routes/session"));
 // Do not mount /api/caregiver a second time.
 
 async function startServer() {
+  await db.execute(
+    `CREATE TABLE IF NOT EXISTS activity_sessions (
+      id INT PRIMARY KEY AUTO_INCREMENT,
+      user_id INT NOT NULL,
+      activity_id INT NOT NULL,
+      activity_type ENUM('autism', 'adhd', 'dyslexia') NOT NULL,
+      activity_key VARCHAR(80) DEFAULT NULL,
+      score_percent INT NOT NULL DEFAULT 0,
+      time_spent_seconds INT DEFAULT 0,
+      completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (activity_id) REFERENCES activities(id) ON DELETE CASCADE,
+      INDEX idx_user_sessions (user_id),
+      INDEX idx_user_type_sessions (user_id, activity_type)
+    )`
+  );
+
   const [columns] = await db.execute(
     "SHOW COLUMNS FROM activity_sessions LIKE 'activity_key'"
   );
