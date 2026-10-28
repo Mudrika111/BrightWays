@@ -64,7 +64,7 @@
         <h2 id="greet-text">Hi there! 👋</h2>
         <p  id="greet-sub">Ready for today's activities?</p>
       </div>
-      <div class="streak-badge">🔥 3-day streak!</div>
+      <div class="streak-badge">⭐ Ready to learn!</div>
     </div>
 
     <div class="prog-section">
@@ -105,40 +105,35 @@
     };
 
     function normaliseCondition(raw) {
-      if (!raw) return 'ADHD';
+      if (typeof raw !== 'string') return null;
       const s = raw.trim().toLowerCase();
       if (s === 'adhd')     return 'ADHD';
       if (s === 'dyslexia') return 'Dyslexia';
       if (s === 'autism')   return 'Autism';
-      return raw.charAt(0).toUpperCase() + raw.slice(1);
-    }
-
-    // ── FIX: scope localStorage keys per child user id ──────────────────
-    // This prevents User A's completed cards from showing as done for User B.
-    // We use child_user_id (the child's own account id) as the namespace.
-    let CHILD_UID = null;
-
-    function localKey(cardKey) {
-      const today = new Date().toDateString();
-      // Prefix with child user id so different children never share keys
-      return `uid${CHILD_UID}_${cardKey}_${today}`;
+      return null;
     }
 
     function isCardDone(cardKey) {
-      return localStorage.getItem(localKey(cardKey)) === "1";
+      return completedActivityKeys.has(cardKey);
     }
 
-    function countDoneCards(acts) {
-      return acts.filter(a => isCardDone(a.cardKey)).length;
-    }
+    let completedActivityKeys = new Set();
 
     function updateProgress(done, total) {
-      document.getElementById('prog-label').textContent = `${done} / ${total} done`;
-      document.getElementById('prog-fill').style.width  = `${Math.min((done / total) * 100, 100)}%`;
+      document.getElementById('prog-label').textContent =
+        total ? `${done} / ${total} done` : 'Activities unavailable';
+      const percent = total ? Math.min((done / total) * 100, 100) : 0;
+      document.getElementById('prog-fill').style.width = `${percent}%`;
     }
 
     function buildGrid(condition) {
-      const acts = ACTIVITIES[condition] || ACTIVITIES['ADHD'];
+      const acts = ACTIVITIES[condition];
+      if (!acts) {
+        document.getElementById('act-grid').textContent =
+          'Your activities are not set up yet. Please ask your caregiver to check your profile.';
+        updateProgress(0, 0);
+        return;
+      }
 
       document.getElementById('act-grid').innerHTML = acts.map(a => {
         const done = isCardDone(a.cardKey);
@@ -153,7 +148,7 @@
         `;
       }).join('');
 
-      updateProgress(countDoneCards(acts), 4);
+      updateProgress(acts.filter(a => isCardDone(a.cardKey)).length, acts.length);
     }
 
     async function logout(event) {
@@ -171,47 +166,49 @@
     }
 
     async function init() {
-      let response;
       try {
-        response = await fetch('/api/session', { credentials: 'include' });
+        const response = await fetch('/api/session', { credentials: 'include' });
+
+        if (!response.ok) {
+          localStorage.removeItem('bw_user');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const data = await response.json();
+        const user = data.user;
+        if (!data.success || !user || user.user_type !== 'child') {
+          window.location.href = 'login.html';
+          return;
+        }
+
+        const progressResponse = await fetch('/api/dashboard', {
+          credentials: 'include'
+        });
+        if (!progressResponse.ok) {
+          throw new Error('Could not load your activity progress.');
+        }
+        const progress = await progressResponse.json();
+        if (!progress.success) {
+          throw new Error(progress.message || 'Could not load your activity progress.');
+        }
+        completedActivityKeys = new Set(progress.completed_activity_keys || []);
+
+        const condition = normaliseCondition(user.condition);
+        const name = user.first_name || user.username || 'there';
+
+        document.getElementById('greet-text').textContent = `Hi ${name}! 👋`;
+        document.getElementById('greet-sub').textContent = condition
+          ? `${condition} activities just for you ✨`
+          : 'Your caregiver can set up your learning activities.';
+        document.getElementById('cond-badge').textContent = condition || 'Profile setup needed';
+
+        buildGrid(condition);
       } catch (err) {
-        console.error('Session check failed:', err);
-        window.location.href = 'login.html';
-        return;
+        console.error('Dashboard load failed:', err);
+        document.getElementById('act-grid').textContent =
+          `Could not load your dashboard: ${err.message}`;
       }
-
-      if (!response.ok) {
-        localStorage.removeItem('bw_user');
-        window.location.href = 'login.html';
-        return;
-      }
-
-      const data = await response.json();
-      const user = data.user;
-      if (!data.success || user.user_type !== 'child') {
-        window.location.href = 'login.html';
-        return;
-      }
-
-      const stored = {
-        id: user.id,
-        child_user_id: user.child_user_id,
-        username: user.username,
-        name: user.first_name || user.username,
-        condition: user.condition,
-        user_type: user.user_type
-      };
-      localStorage.setItem('bw_user', JSON.stringify(stored));
-      CHILD_UID = user.id;
-
-      const condition = normaliseCondition(stored.condition);
-      const name      = stored.name || stored.username || 'there';
-
-      document.getElementById('greet-text').textContent = `Hi ${name}! 👋`;
-      document.getElementById('greet-sub').textContent  = `${condition} activities just for you ✨`;
-      document.getElementById('cond-badge').textContent = condition;
-
-      buildGrid(condition);
     }
 
     init();

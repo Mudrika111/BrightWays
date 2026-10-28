@@ -20,6 +20,8 @@ The backend stores authenticated sessions in MySQL and sends the browser an HTTP
 
 Activity, child-dashboard, and caregiver-dashboard APIs require a valid session and the matching account role. They use the account ID from the session rather than trusting IDs sent by the browser. Serve the frontend from the same origin as the backend so the browser sends the session cookie with API requests.
 
+Dashboard completion and caregiver activity history use the activity card selected by the child. The backend adds the `activity_key` column to an existing `activity_sessions` table when it starts; historical records without that key are shown as previous activities because their exact card cannot be determined.
+
 ## License
 
 ISC License

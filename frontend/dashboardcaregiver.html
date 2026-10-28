@@ -129,10 +129,12 @@
       <div class="charts-grid">
         <div class="chart-card">
           <h4>📈 Accuracy Trend — Last 10 Sessions</h4>
+          <p id="trend-empty" class="chart-empty" style="display:none;color:var(--muted);text-align:center;padding:35px 0">No sessions recorded yet.</p>
           <canvas id="lineChart" height="180"></canvas>
         </div>
         <div class="chart-card">
-          <h4>🎮 Activity Completions</h4>
+          <h4>🎮 Sessions by Activity</h4>
+          <p id="activity-empty" class="chart-empty" style="display:none;color:var(--muted);text-align:center;padding:35px 0">No sessions recorded yet.</p>
           <canvas id="barChart" height="180"></canvas>
         </div>
       </div>
@@ -183,18 +185,46 @@
     return "";
   }
   function capFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ""; }
+  function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+  }
 
   function buildTabs(children) {
-    document.getElementById("tabs-container").innerHTML = children.map((c, i) => `
+    const labels = children.map(child => {
+      const name = child.child_name || "Child";
+      const details = [
+        child.child_age ? `Age ${child.child_age}` : "",
+        capFirst(child.condition_type)
+      ].filter(Boolean).join(" · ");
+      return details ? `${name} · ${details}` : name;
+    });
+    const duplicates = new Set(
+      labels.filter((label, index) =>
+        labels.findIndex(other => other.toLowerCase() === label.toLowerCase()) !== index
+      ).map(label => label.toLowerCase())
+    );
+
+    document.getElementById("tabs-container").innerHTML = children.map((c, i) => {
+      const label = duplicates.has(labels[i].toLowerCase())
+        ? `${labels[i]} · Profile ${c.profile_id}`
+        : labels[i];
+      return `
       <button class="ctab${i === 0 ? " active" : ""}" onclick="switchChild(this,${i})">
-        ${c.child_name}
-        <span class="cond-pill ${condPillClass(c.condition_type)}">${capFirst(c.condition_type)}</span>
-      </button>`).join("");
+        ${escapeHTML(label)}
+      </button>`;
+    }).join("");
   }
 
   function renderKPIs(child) {
     const s = child.statistics || {};
-    document.getElementById("kpi-accuracy").textContent  = s.avg_score != null ? s.avg_score + "%" : "—";
+    document.getElementById("kpi-accuracy").textContent  =
+      s.total_sessions > 0 && s.avg_score != null ? s.avg_score + "%" : "—";
     document.getElementById("kpi-sessions").textContent  = s.total_sessions ?? "—";
     document.getElementById("kpi-completed").textContent = s.total_completed ?? "—";
     document.getElementById("kpi-condition").textContent = capFirst(child.condition_type) || "—";
@@ -207,35 +237,50 @@
       tbody.innerHTML = `<tr class="empty-row"><td colspan="6">No sessions recorded yet 🎮</td></tr>`;
       return;
     }
-    tbody.innerHTML = sessions.map(s => `
+    tbody.innerHTML = sessions.map(s => {
+      const score = Math.max(0, Math.min(Number(s.score) || 0, 100));
+      return `
       <tr>
-        <td>${s.date}</td><td>${s.activity}</td><td>${s.type}</td>
+        <td>${escapeHTML(s.date)}</td><td>${escapeHTML(s.activity)}</td><td>${escapeHTML(s.type)}</td>
         <td>
           <div class="mini-bar">
-            <div class="mini-track"><div class="mini-fill" style="width:${s.score}%;background:${scoreColor(s.score)}"></div></div>
-            <span style="font-weight:700;min-width:38px">${s.score}%</span>
+            <div class="mini-track"><div class="mini-fill" style="width:${score}%;background:${scoreColor(score)}"></div></div>
+            <span style="font-weight:700;min-width:38px">${score}%</span>
           </div>
         </td>
-        <td>${s.time}</td>
+        <td>${escapeHTML(s.time)}</td>
         <td><span class="badge-done">✓ Done</span></td>
-      </tr>`).join("");
+      </tr>`;
+    }).join("");
   }
 
   function renderCharts(trend, breakdown) {
     if (lineChart) lineChart.destroy();
     if (barChart)  barChart.destroy();
-    const lineData  = (trend?.data?.length)     ? trend     : { labels: ["No data"], data: [0] };
-    const breakData = (breakdown?.data?.length) ? breakdown : { labels: ["No data"], data: [0] };
-    lineChart = new Chart(document.getElementById("lineChart"), {
-      type: "line",
-      data: { labels: lineData.labels, datasets: [{ label: "Accuracy %", data: lineData.data, borderColor: "#00B894", backgroundColor: "rgba(0,184,148,0.08)", tension: .4, pointBackgroundColor: "#00B894", pointRadius: 5, fill: true, pointHoverRadius: 7 }] },
-      options: { plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 }, x: { grid: { display: false } } }, responsive: true }
-    });
-    barChart = new Chart(document.getElementById("barChart"), {
-      type: "bar",
-      data: { labels: breakData.labels.map(capFirst), datasets: [{ data: breakData.data, backgroundColor: ["#FF9500","#0EA5E9","#6C63FF","#FF6584","#00B894"], borderRadius: 8, borderSkipped: false }] },
-      options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false } } }, responsive: true }
-    });
+    lineChart = null;
+    barChart = null;
+    const hasTrend = Boolean(trend?.data?.length);
+    const hasBreakdown = Boolean(breakdown?.data?.length);
+    document.getElementById("lineChart").style.display = hasTrend ? "" : "none";
+    document.getElementById("trend-empty").style.display = hasTrend ? "none" : "";
+    document.getElementById("barChart").style.display = hasBreakdown ? "" : "none";
+    document.getElementById("activity-empty").style.display = hasBreakdown ? "none" : "";
+
+    if (hasTrend) {
+      lineChart = new Chart(document.getElementById("lineChart"), {
+        type: "line",
+        data: { labels: trend.labels, datasets: [{ label: "Accuracy %", data: trend.data, borderColor: "#00B894", backgroundColor: "rgba(0,184,148,0.08)", tension: .4, pointBackgroundColor: "#00B894", pointRadius: 5, fill: true, pointHoverRadius: 7 }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100 }, x: { grid: { display: false } } }, responsive: true }
+      });
+    }
+
+    if (hasBreakdown) {
+      barChart = new Chart(document.getElementById("barChart"), {
+        type: "bar",
+        data: { labels: breakdown.labels, datasets: [{ data: breakdown.data, backgroundColor: ["#FF9500","#0EA5E9","#6C63FF","#FF6584","#00B894"], borderRadius: 8, borderSkipped: false }] },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } }, x: { grid: { display: false } } }, responsive: true }
+      });
+    }
   }
 
   function switchChild(btn, idx) {

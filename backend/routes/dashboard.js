@@ -14,23 +14,19 @@ router.get("/", async (req, res) => {
     );
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-    // Count how many times the child has completed an activity today
-    const [[done]] = await db.execute(
-      `SELECT COUNT(*) as c
+    const [completed] = await db.execute(
+      `SELECT DISTINCT activity_key
        FROM activity_sessions
        WHERE user_id = ?
-       AND DATE(completed_at) = CURDATE()`,
+         AND DATE(completed_at) = CURDATE()
+         AND activity_key IS NOT NULL`,
       [user_id]
     );
 
-    // UI always shows 4 cards per condition — hardcode total to 4
     res.json({
       success: true,
       user,
-      statistics: {
-        total_completed:  Math.min(done.c || 0, 4),
-        total_activities: 4
-      }
+      completed_activity_keys: completed.map(row => row.activity_key)
     });
 
   } catch (err) {

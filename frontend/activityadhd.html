@@ -83,14 +83,7 @@
    SHARED SETUP
 ═══════════════════════════════════════════════════════════════ */
 const API_URL       = "/api/activity";
-const USER          = JSON.parse(localStorage.getItem("bw_user") || "{}");
-const USER_ID       = USER.child_user_id || USER.id;
-const ACTIVITY_TYPE = "adhd";
 const CARD_KEY      = new URLSearchParams(window.location.search).get("card") || "bw_done_adhd_memory";
-
-function localDoneKey() {
-  return `uid${USER_ID}_${CARD_KEY}_${new Date().toDateString()}`;
-}
 
 let startTime = Date.now();
 
@@ -107,14 +100,13 @@ async function saveAndFinish(score, total, modalTitle) {
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
-        activity_type:      ACTIVITY_TYPE,
+        activity_key:       CARD_KEY,
         score_percent:      percent,
         time_spent_seconds: timeSpent
       })
     });
     const data = await res.json();
     if (data.success) {
-      localStorage.setItem(localDoneKey(), "1");
       document.getElementById("save-status").textContent = "✓ Progress saved!";
     } else {
       document.getElementById("save-status").textContent = "⚠ Save failed: " + (data.message || "unknown error");

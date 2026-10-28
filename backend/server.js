@@ -5,6 +5,7 @@ const express = require("express");
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
 const path = require("path");
+const db = require("./db");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -59,6 +60,22 @@ app.use("/api/session", require("./routes/session"));
 
 // Do not mount /api/caregiver a second time.
 
-app.listen(PORT, () => {
-  console.log(`BrightWays server running at http://localhost:${PORT}`);
+async function startServer() {
+  const [columns] = await db.execute(
+    "SHOW COLUMNS FROM activity_sessions LIKE 'activity_key'"
+  );
+  if (columns.length === 0) {
+    await db.execute(
+      "ALTER TABLE activity_sessions ADD COLUMN activity_key VARCHAR(80) DEFAULT NULL"
+    );
+  }
+
+  app.listen(PORT, () => {
+    console.log(`BrightWays server running at http://localhost:${PORT}`);
+  });
+}
+
+startServer().catch((err) => {
+  console.error("Unable to initialize the database or start the server:", err);
+  process.exitCode = 1;
 });

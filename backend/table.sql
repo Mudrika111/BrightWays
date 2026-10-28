@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS activity_sessions (
     user_id INT NOT NULL,
     activity_id INT NOT NULL,
     activity_type ENUM('autism', 'adhd', 'dyslexia') NOT NULL,
+    activity_key VARCHAR(80) DEFAULT NULL,
     score_percent INT NOT NULL DEFAULT 0,
     time_spent_seconds INT DEFAULT 0,
     completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

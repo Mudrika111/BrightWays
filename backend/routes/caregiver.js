@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
+const { getActivity } = require("../activityCatalog");
 
 // GET caregiver dashboard
 router.get("/", async (req, res) => {
@@ -45,7 +46,7 @@ router.get("/", async (req, res) => {
         sessions: [],
         statistics: {
           total_completed: 0,
-          avg_score: 0,
+          avg_score: null,
           total_sessions: 0
         },
         accuracy_trend: {
@@ -63,9 +64,9 @@ router.get("/", async (req, res) => {
 
         // 🔹 Sessions
         const [sessions] = await db.execute(
-          `SELECT s.completed_at, a.title, s.activity_type, s.score_percent, s.time_spent_seconds
+          `SELECT s.completed_at, s.activity_key, s.activity_type,
+                  s.score_percent, s.time_spent_seconds
            FROM activity_sessions s
-           JOIN activities a ON a.id = s.activity_id
            WHERE s.user_id = ?
            ORDER BY s.completed_at DESC
            LIMIT 10`,
@@ -74,7 +75,7 @@ router.get("/", async (req, res) => {
 
         entry.sessions = sessions.map(s => ({
           date: new Date(s.completed_at).toLocaleDateString("en-US", { month: "short", day: "2-digit" }),
-          activity: s.title,
+          activity: getActivity(s.activity_key)?.title || `Previous ${s.activity_type} activity`,
           type: s.activity_type.charAt(0).toUpperCase() + s.activity_type.slice(1),
           score: s.score_percent,
           time: `${Math.floor(s.time_spent_seconds / 60)}m ${s.time_spent_seconds % 60}s`,
@@ -84,28 +85,28 @@ router.get("/", async (req, res) => {
         // 🔹 Stats
         const [[stat]] = await db.execute(
           `SELECT COUNT(*) as total_sessions,
-                  COALESCE(AVG(score_percent),0) as avg_score
+                  AVG(score_percent) as avg_score
            FROM activity_sessions
            WHERE user_id = ?`,
           [uid]
         );
 
         const [[completed]] = await db.execute(
-          `SELECT COUNT(*) as total_completed
-           FROM user_activity_progress
-           WHERE user_id = ? AND status = 'completed'`,
+          `SELECT COUNT(DISTINCT activity_key) as total_completed
+           FROM activity_sessions
+           WHERE user_id = ? AND activity_key IS NOT NULL`,
           [uid]
         );
 
         entry.statistics = {
           total_completed: completed.total_completed,
-          avg_score: Math.round(stat.avg_score),
+          avg_score: stat.avg_score === null ? null : Math.round(stat.avg_score),
           total_sessions: stat.total_sessions
         };
 
         // 🔹 Accuracy trend
         const [trend] = await db.execute(
-          `SELECT score_percent
+          `SELECT score_percent, completed_at
            FROM activity_sessions
            WHERE user_id = ?
            ORDER BY completed_at DESC
@@ -116,21 +117,24 @@ router.get("/", async (req, res) => {
         const trendData = trend.map(t => t.score_percent).reverse();
 
         entry.accuracy_trend = {
-          labels: trendData.map((_, i) => `S${i + 1}`),
+          labels: trend.map(row => new Date(row.completed_at)
+            .toLocaleDateString("en-US", { month: "short", day: "numeric" })).reverse(),
           data: trendData
         };
 
         // 🔹 Activity breakdown
         const [breakdown] = await db.execute(
-          `SELECT activity_type, COUNT(*) as cnt
+          `SELECT activity_key, activity_type, COUNT(*) as cnt
            FROM activity_sessions
            WHERE user_id = ?
-           GROUP BY activity_type`,
+           GROUP BY activity_key, activity_type`,
           [uid]
         );
 
         entry.activity_breakdown = {
-          labels: breakdown.map(b => b.activity_type),
+          labels: breakdown.map(b =>
+            getActivity(b.activity_key)?.title || `Previous ${b.activity_type} activity`
+          ),
           data: breakdown.map(b => b.cnt)
         };
       }

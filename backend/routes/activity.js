@@ -1,6 +1,7 @@
 const express = require("express");
 const router  = express.Router();
 const db      = require("../db");
+const { getActivity } = require("../activityCatalog");
 
 router.get("/", async (req, res) => {
   try {
@@ -19,38 +20,61 @@ router.get("/", async (req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const { activity_type, score_percent, time_spent_seconds } = req.body;
+    const {
+      activity_key,
+      score_percent,
+      time_spent_seconds
+    } = req.body || {};
     const user_id = req.session.user.id;
+    const activity = getActivity(activity_key);
 
-    if (!activity_type) {
-      return res.status(400).json({ success: false, message: "Missing required fields" });
+    if (!activity) {
+      return res.status(400).json({
+        success: false,
+        message: "A valid activity must be selected"
+      });
     }
 
-    const type = activity_type.toLowerCase();
+    if (
+      typeof score_percent !== "number" ||
+      !Number.isFinite(score_percent) ||
+      score_percent < 0 ||
+      score_percent > 100 ||
+      typeof time_spent_seconds !== "number" ||
+      !Number.isFinite(time_spent_seconds) ||
+      time_spent_seconds < 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Score and time must be valid non-negative numbers"
+      });
+    }
+    const score = score_percent;
+    const timeSpent = time_spent_seconds;
 
-    // Get all activity IDs for this type
     const [actRows] = await db.execute(
-      "SELECT id FROM activities WHERE activity_type = ? ORDER BY id ASC",
-      [type]
+      `SELECT id
+       FROM activities
+       WHERE activity_type = ?
+       ORDER BY id ASC
+       LIMIT 1`,
+      [activity.type]
     );
 
     if (actRows.length === 0) {
-      return res.status(400).json({ success: false, message: "No activities found for type: " + type });
+      return res.status(400).json({
+        success: false,
+        message: `No activities found for type: ${activity.type}`
+      });
     }
 
-    // Pick a random activity_id from available ones so each session
-    // can map to different activities (avoids always reusing the same ID)
-    const activity_id = actRows[Math.floor(Math.random() * actRows.length)].id;
+    const activity_id = actRows[0].id;
 
-    const score     = score_percent      || 0;
-    const timeSpent = time_spent_seconds || 0;
-
-    // Always insert a new session row (allows counting multiple completions today)
     await db.execute(
       `INSERT INTO activity_sessions
-       (user_id, activity_id, activity_type, score_percent, time_spent_seconds)
-       VALUES (?, ?, ?, ?, ?)`,
-      [user_id, activity_id, type, score, timeSpent]
+       (user_id, activity_id, activity_type, activity_key, score_percent, time_spent_seconds)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [user_id, activity_id, activity.type, activity_key, score, timeSpent]
     );
 
     // Update best score in progress table
@@ -69,8 +93,8 @@ router.post("/", async (req, res) => {
     res.json({ success: true, message: "Saved" });
 
   } catch (err) {
-    console.error("Save activity error:", err.message);
-    res.status(500).json({ success: false, message: err.message });
+    console.error("Save activity error:", err);
+    res.status(500).json({ success: false, message: "Unable to save activity" });
   }
 });
 
