@@ -36,3 +36,22 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
     .ls-opt .ls-word  { font-size: .9rem; font-weight: 700; }
     .ls-opt.correct { background: #dcfce7; border-color: #22c55e; }
     .ls-opt.wrong   { background: #fee2e2; border-color: #ef4444; }
+    .wb-clue, .syllable-clue { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 82px; margin: 14px 0; padding: 12px; border-radius: 13px; background: #FFF7E8; color: #59452D; font-weight: 700; text-align: center; }
+    .wb-picture, #syllable-picture { font-size: 2.7rem; }
+    .wb-slots, .syllable-built { display: flex; justify-content: center; flex-wrap: wrap; gap: 9px; min-height: 58px; margin: 12px 0; }
+    .wb-slot, .syllable-slot { display: grid; place-items: center; min-width: 48px; min-height: 50px; border: 2px dashed #D6B979; border-radius: 10px; background: #FFFCF5; color: #80622D; font-size: 1.25rem; font-weight: 900; }
+    .wb-slot.filled, .syllable-slot.filled { border-style: solid; background: white; cursor: pointer; }
+    .wb-tiles, .syllable-pieces { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+    .wb-tile, .syllable-piece { min-width: 52px; min-height: 52px; padding: 8px 13px; border: 2px solid #E8D6AB; border-radius: 12px; background: white; color: #614A2C; font: inherit; font-size: 1.2rem; font-weight: 900; cursor: pointer; }
+    .syllable-piece { font-size: 1rem; }
+    .wb-tile:hover:not(:disabled), .syllable-piece:hover:not(:disabled) { border-color: #F0A72E; background: #FFF7E8; }
+    .wb-tile.used, .syllable-piece.used { opacity: .45; }
+    .wb-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .wb-actions > * { margin: 0; }
+    .wb-actions button:disabled, .wb-tile:disabled, .syllable-piece:disabled { opacity: .5; cursor: not-allowed; }
+    .wb-tile:focus-visible, .syllable-piece:focus-visible, .wb-slot:focus-visible, .syllable-slot:focus-visible { outline: 3px solid #1D4ED8; outline-offset: 3px; }
+    @media (prefers-reduced-motion: reduce) { .wb-tile, .syllable-piece { transition: none; } }
+    @media (max-width: 520px) {
+      .wb-clue, .syllable-clue { align-items: flex-start; font-size: .9rem; }
+      .wb-slot, .syllable-slot { min-width: 42px; min-height: 46px; }
+    }

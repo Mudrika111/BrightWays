@@ -45,3 +45,22 @@ body { display: flex; flex-direction: column; min-height: 100vh; }
     .sort-check-btn { display: block; margin: 10px auto 0; padding: 11px 28px; border-radius: 8px; background: var(--violet, #6C63FF); color: white; font-weight: 700; font-size: .9rem; border: none; cursor: pointer; }
     .sort-check-btn:disabled { opacity: .5; cursor: default; }
     .sort-feedback { text-align: center; font-weight: 700; font-size: .92rem; margin-top: 8px; min-height: 20px; }
+    .comfort-scene { margin: 8px 0; text-align: center; font-size: 2.8rem; }
+    .comfort-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin: 14px 0; }
+    .comfort-option { display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 10px 12px; border: 2px solid #E5E7EB; border-radius: 12px; background: white; color: #333; font: inherit; font-weight: 700; text-align: left; cursor: pointer; }
+    .comfort-option > span { font-size: 1.5rem; }
+    .comfort-option.selected { border-color: #6C63FF; background: #EFEEFD; }
+    .comfort-summary { min-height: 48px; padding: 12px; border-radius: 10px; background: #F7F6FF; color: #4B4780; font-weight: 700; }
+    .comfort-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+    .comfort-actions > * { margin: 0; }
+    .comfort-actions button:disabled { opacity: .5; cursor: not-allowed; }
+    .comfort-option:focus-visible { outline: 3px solid #1D4ED8; outline-offset: 3px; }
+    .choice-story-card { margin: 14px 0; padding: 16px; border: 2px solid #E6E2F8; border-radius: 14px; background: white; }
+    .choice-story-scene { margin-bottom: 8px; text-align: center; font-size: 2.6rem; }
+    .choice-story-card h2 { margin: 6px 0 14px; font-family: 'Baloo 2', cursive; font-size: 1.15rem; line-height: 1.35; text-align: center; }
+    .choice-outcome { min-height: 48px; margin: 8px 0; color: #4B4780; font-weight: 700; text-align: center; }
+    #choice-next { background: #6C63FF; }
+    .comfort-option, .choice-story-card .story-opt { transition: border-color .15s, background-color .15s; }
+    .comfort-option:focus-visible, .choice-story-card .story-opt:focus-visible { outline: 3px solid #1D4ED8; outline-offset: 3px; }
+    @media (prefers-reduced-motion: reduce) { .comfort-option, .choice-story-card .story-opt { transition: none; } }
+    @media (max-width: 520px) { .comfort-options { grid-template-columns: 1fr; } }

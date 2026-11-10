@@ -256,6 +256,233 @@ function initLetterSounds() {
   show();
 }
 
+function initWordBuilder() {
+  const box = document.getElementById("act-box");
+  if (!box) throw new Error("Word Builder activity container was not found.");
+  box.innerHTML = `
+    <div class="act-header">
+      <span class="act-title">🧱 Word Builder</span>
+      <span id="wb-round">Word 1 / 4</span>
+    </div>
+    <p class="game-instructions">Put one letter in each box to build the word. Take your time—you can change any letter.</p>
+    <div class="wb-clue">
+      <span class="wb-picture" id="wb-picture" aria-hidden="true"></span>
+      <span id="wb-clue"></span>
+    </div>
+    <div class="wb-slots" id="wb-slots" aria-label="Your word"></div>
+    <div class="wb-tiles" id="wb-tiles" aria-label="Choose a letter"></div>
+    <p class="game-feedback" id="wb-feedback" aria-live="polite"></p>
+    <div class="wb-actions">
+      <button class="seq-opt" type="button" onclick="wbClear()">Start over</button>
+      <button class="game-action" id="wb-check" type="button" disabled onclick="wbCheck()">Check my word →</button>
+      <button class="game-action" id="wb-next" type="button" style="display:none" onclick="wbNext()">Next word →</button>
+    </div>
+  `;
+  const rounds = [
+    { picture: "🐱", clue: "A pet that purrs and says meow", answer: "CAT", hint: "Listen for /k/ at the beginning." },
+    { picture: "☀️", clue: "It shines in the sky during the day", answer: "SUN", hint: "Listen for /s/ at the beginning." },
+    { picture: "🐶", clue: "A pet that barks", answer: "DOG", hint: "Listen for /d/ at the beginning." },
+    { picture: "🗺️", clue: "You can use it to find your way", answer: "MAP", hint: "Listen for /m/ at the beginning." }
+  ];
+  let round = 0;
+  let selected: number[] = [];
+  let score = 0;
+  let checked = false;
+
+  function render() {
+    const current = rounds[round];
+    selected = [];
+    checked = false;
+    document.getElementById("wb-round").textContent = `Word ${round + 1} / ${rounds.length}`;
+    document.getElementById("wb-picture").textContent = current.picture;
+    document.getElementById("wb-clue").textContent = current.clue;
+    document.getElementById("wb-feedback").textContent = current.hint;
+    document.getElementById("wb-next").style.display = "none";
+    document.getElementById("wb-check").style.display = "";
+    document.getElementById("wb-tiles").innerHTML = [...current.answer, "E"].map((letter, index) =>
+      `<button class="wb-tile" type="button" aria-label="Choose letter ${letter}" onclick="wbPick(${index})">${letter}</button>`
+    ).join("");
+    renderSlots();
+  }
+
+  function renderSlots() {
+    const current = rounds[round];
+    document.getElementById("wb-slots").innerHTML = Array.from({ length: current.answer.length }, (_, slot) => {
+      const tileIndex = selected[slot];
+      return tileIndex === undefined
+        ? `<span class="wb-slot" aria-label="Empty letter ${slot + 1}">_</span>`
+        : `<button class="wb-slot filled" type="button" aria-label="Remove ${current.answer[tileIndex]}" onclick="wbRemove(${slot})">${[...current.answer, "E"][tileIndex]}</button>`;
+    }).join("");
+    document.querySelectorAll<HTMLButtonElement>(".wb-tile").forEach((button, index) => {
+      button.disabled = selected.includes(index) || checked;
+      button.classList.toggle("used", selected.includes(index));
+    });
+    (document.getElementById("wb-check") as HTMLButtonElement).disabled = selected.length !== current.answer.length || checked;
+  }
+
+  window.wbPick = index => {
+    if (checked || selected.length >= rounds[round].answer.length || selected.includes(index)) return;
+    selected.push(index);
+    document.getElementById("wb-feedback").textContent = "Keep going—one letter in each box.";
+    renderSlots();
+    const target = selected.length === rounds[round].answer.length
+      ? document.getElementById("wb-check")
+      : document.querySelector<HTMLButtonElement>(".wb-tile:not(:disabled)");
+    target?.focus();
+  };
+  window.wbRemove = slot => {
+    if (checked) return;
+    selected.splice(slot, 1);
+    document.getElementById("wb-feedback").textContent = rounds[round].hint;
+    renderSlots();
+    document.querySelector<HTMLButtonElement>(".wb-tile:not(:disabled)")?.focus();
+  };
+  window.wbClear = () => {
+    if (checked) return;
+    selected = [];
+    document.getElementById("wb-feedback").textContent = rounds[round].hint;
+    renderSlots();
+    document.querySelector<HTMLButtonElement>(".wb-tile:not(:disabled)")?.focus();
+  };
+  window.wbCheck = () => {
+    if (selected.length !== rounds[round].answer.length || checked) return;
+    const letters = [...rounds[round].answer, "E"];
+    const word = selected.map(index => letters[index]).join("");
+    if (word !== rounds[round].answer) {
+      document.getElementById("wb-feedback").textContent = "Not quite. Tap a letter in your word to change it, then try again.";
+      return;
+    }
+    checked = true;
+    score++;
+    document.getElementById("wb-feedback").textContent = `Great building! ${word} is made of ${word.split("").join(" · ")}.`;
+    document.getElementById("wb-check").style.display = "none";
+    const next = document.getElementById("wb-next") as HTMLButtonElement;
+    next.textContent = round === rounds.length - 1 ? "Finish →" : "Next word →";
+    next.style.display = "";
+    renderSlots();
+    next.focus();
+  };
+  window.wbNext = () => {
+    if (!checked) return;
+    round++;
+    if (round >= rounds.length) return saveAndFinish(score, rounds.length);
+    render();
+    document.querySelector<HTMLButtonElement>(".wb-tile")?.focus();
+  };
+
+  render();
+}
+
+function initSyllableBuilder() {
+  const box = document.getElementById("act-box");
+  if (!box) throw new Error("Syllable Builder activity container was not found.");
+  box.innerHTML = `
+    <div class="act-header">
+      <span class="act-title">🧭 Syllable Safari</span>
+      <span id="syllable-round">Word 1 / 3</span>
+    </div>
+    <p class="game-instructions">Tap the word parts in order to build the picture's name. You can undo and try again.</p>
+    <div class="syllable-clue">
+      <span id="syllable-picture" aria-hidden="true"></span>
+      <span id="syllable-clue"></span>
+    </div>
+    <div class="syllable-built" id="syllable-built" aria-label="Your word"></div>
+    <div class="syllable-pieces" id="syllable-pieces"></div>
+    <p class="game-feedback" id="syllable-feedback" aria-live="polite"></p>
+    <div class="wb-actions">
+      <button class="seq-opt" type="button" onclick="syllableClear()">Start over</button>
+      <button class="game-action" id="syllable-next" type="button" style="display:none" onclick="syllableNext()">Next word →</button>
+    </div>
+  `;
+  const rounds = [
+    { picture: "🌈", clue: "A colorful arc in the sky", pieces: ["bow", "rain"], answer: [1, 0] },
+    { picture: "🧁", clue: "A little treat baked in a paper cup", pieces: ["cake", "cup"], answer: [1, 0] },
+    { picture: "🌇", clue: "When the sun goes down", pieces: ["set", "sun"], answer: [1, 0] }
+  ];
+  let round = 0;
+  let selected: number[] = [];
+  let score = 0;
+  let checked = false;
+
+  function render() {
+    const current = rounds[round];
+    selected = [];
+    checked = false;
+    document.getElementById("syllable-round").textContent = `Word ${round + 1} / ${rounds.length}`;
+    document.getElementById("syllable-picture").textContent = current.picture;
+    document.getElementById("syllable-clue").textContent = current.clue;
+    document.getElementById("syllable-feedback").textContent = "Build the word one part at a time.";
+    document.getElementById("syllable-next").style.display = "none";
+    document.getElementById("syllable-pieces").innerHTML = current.pieces.map((piece, index) =>
+      `<button class="syllable-piece" type="button" onclick="syllablePick(${index})">${piece}</button>`
+    ).join("");
+    renderBuilt();
+  }
+
+  function renderBuilt() {
+    const current = rounds[round];
+    document.getElementById("syllable-built").innerHTML = current.answer.map((_, slot) => {
+      const pieceIndex = selected[slot];
+      return pieceIndex === undefined
+        ? `<span class="syllable-slot" aria-label="Empty word part ${slot + 1}">…</span>`
+        : `<button class="syllable-slot filled" type="button" aria-label="Remove ${current.pieces[pieceIndex]}" onclick="syllableRemove(${slot})">${current.pieces[pieceIndex]}</button>`;
+    }).join("");
+    document.querySelectorAll<HTMLButtonElement>(".syllable-piece").forEach((button, index) => {
+      button.disabled = selected.includes(index) || checked;
+      button.classList.toggle("used", selected.includes(index));
+    });
+  }
+
+  window.syllablePick = index => {
+    if (checked || selected.includes(index) || selected.length >= rounds[round].answer.length) return;
+    selected.push(index);
+    if (selected.length === rounds[round].answer.length) {
+      const correct = selected.every((piece, slot) => piece === rounds[round].answer[slot]);
+      if (correct) {
+        checked = true;
+        score++;
+        document.getElementById("syllable-feedback").textContent = `You built it! ${selected.map(piece => rounds[round].pieces[piece]).join(" · ")}.`;
+        const next = document.getElementById("syllable-next") as HTMLButtonElement;
+        next.textContent = round === rounds.length - 1 ? "Finish safari →" : "Next word →";
+        next.style.display = "";
+        next.focus();
+      } else {
+        document.getElementById("syllable-feedback").textContent = "Those parts make a different word. Tap a part to change it, or start over.";
+      }
+    }
+    renderBuilt();
+    const target = checked
+      ? document.getElementById("syllable-next")
+      : selected.length === rounds[round].answer.length
+        ? document.querySelector<HTMLButtonElement>(".syllable-slot.filled")
+        : document.querySelector<HTMLButtonElement>(".syllable-piece:not(:disabled)");
+    target?.focus();
+  };
+  window.syllableRemove = slot => {
+    if (checked) return;
+    selected.splice(slot, 1);
+    document.getElementById("syllable-feedback").textContent = "Choose the word parts in the order that sounds right.";
+    renderBuilt();
+    document.querySelector<HTMLButtonElement>(".syllable-piece:not(:disabled)")?.focus();
+  };
+  window.syllableClear = () => {
+    if (checked) return;
+    selected = [];
+    document.getElementById("syllable-feedback").textContent = "Build the word one part at a time.";
+    renderBuilt();
+    document.querySelector<HTMLButtonElement>(".syllable-piece:not(:disabled)")?.focus();
+  };
+  window.syllableNext = () => {
+    if (!checked) return;
+    round++;
+    if (round >= rounds.length) return saveAndFinish(score, rounds.length);
+    render();
+    document.querySelector<HTMLButtonElement>(".syllable-piece")?.focus();
+  };
+
+  render();
+}
+
 /* ═══════════════════════════════════════════════════════════════
    ROUTER — pick game based on card param
 ═══════════════════════════════════════════════════════════════ */
@@ -269,6 +496,8 @@ export function startActivityGame(cardKey) {
     case 'bw_done_dyslexia_word': initWordMatch(); break;
     case 'bw_done_dyslexia_rhyme': initRhymeTime(); break;
     case 'bw_done_dyslexia_letters': initLetterSounds(); break;
+    case 'bw_done_dyslexia_builder': initWordBuilder(); break;
+    case 'bw_done_dyslexia_syllables': initSyllableBuilder(); break;
     default: initPhonics();
   }
 }

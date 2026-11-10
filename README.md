@@ -6,6 +6,16 @@ Educational platform for children with neurodivergence (autism, ADHD, dyslexia) 
 
 BrightWays delivers tailored learning activities with real-time progress monitoring for children and caregivers. Features customized exercises by condition type, analytics dashboards, and multi-child management.
 
+The child dashboard offers 21 activities across its three learning profiles. New activities use short, self-paced interactions, clear instructions, reversible choices, and encouraging feedback. Literacy games practise building words from letters and word parts; choice-based activities let children decide what feels right for them. These are learning and play activities, not diagnostic or therapeutic tools.
+
+## Activity design references
+
+- [CAST: Universal Design for Learning](https://www.cast.org/what-we-do/universal-design-for-learning) — meaningful options for engagement, representation, and action.
+- [What Works Clearinghouse: Foundational Skills to Support Reading for Understanding in Kindergarten Through 3rd Grade](https://ies.ed.gov/ncee/wwc/PracticeGuide/21) — evidence ratings for linking speech sounds to letters and decoding words.
+- [International Dyslexia Association: Effective Reading Instruction](https://dyslexiaida.org/effective-reading-instruction/) — explicit, systematic instruction in phonology, sound-symbol association, and word parts.
+- [W3C: Animation from Interactions](https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions.html) — guidance on reducing nonessential motion and respecting motion preferences.
+- [National Autistic Society: Autism and communication](https://www.autism.org.uk/advice-and-guidance/about-autism/autism-and-communication) — communication varies; support choices should not assume one response fits everyone.
+
 ## How It's Made
 
 **Backend**: Node.js, Express.js, Bcrypt, Socket.io  

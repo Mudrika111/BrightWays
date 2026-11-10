@@ -395,6 +395,141 @@ function initSortMatch() {
   startRound();
 }
 
+function initComfortKit() {
+  const box = document.getElementById("act-box");
+  if (!box) throw new Error("Comfort Kit activity container was not found.");
+  box.innerHTML = `
+    <div class="act-header">
+      <span class="act-title">🧰 My Comfort Kit</span>
+      <span>Pick what works for you</span>
+    </div>
+    <div class="comfort-scene" aria-hidden="true">🎒✨</div>
+    <p class="game-instructions">Choose any things that might feel helpful. You can pick one, several, or none.</p>
+    <div class="comfort-options" id="comfort-options"></div>
+    <p class="comfort-summary" id="comfort-summary" aria-live="polite">Your choices will appear here.</p>
+    <div class="comfort-actions">
+      <button class="seq-opt" type="button" onclick="comfortSkip()">I don't need a kit right now</button>
+      <button class="game-action" id="comfort-finish" type="button" disabled onclick="comfortFinish()">My kit is ready →</button>
+    </div>
+  `;
+  const options = [
+    { emoji: "🧸", label: "A familiar toy" },
+    { emoji: "🎧", label: "Headphones" },
+    { emoji: "🧩", label: "A fidget or puzzle" },
+    { emoji: "📕", label: "A favorite book" },
+    { emoji: "💧", label: "A drink of water" },
+    { emoji: "🛋️", label: "A quiet place" },
+    { emoji: "🤝", label: "Help from someone I trust" }
+  ];
+  const selected = new Set<number>();
+
+  function render() {
+    document.getElementById("comfort-options").innerHTML = options.map((option, index) =>
+      `<button class="comfort-option${selected.has(index) ? " selected" : ""}" type="button" data-comfort-index="${index}" aria-pressed="${selected.has(index)}" onclick="comfortToggle(${index})"><span aria-hidden="true">${option.emoji}</span>${option.label}</button>`
+    ).join("");
+    const names = [...selected].map(index => options[index].label);
+    document.getElementById("comfort-summary").textContent = names.length
+      ? `In your kit: ${names.join(", ")}`
+      : "Your choices will appear here.";
+    (document.getElementById("comfort-finish") as HTMLButtonElement).disabled = selected.size === 0;
+  }
+
+  window.comfortToggle = index => {
+    if (selected.has(index)) selected.delete(index);
+    else selected.add(index);
+    render();
+    document.querySelector<HTMLButtonElement>(`[data-comfort-index="${index}"]`)?.focus();
+  };
+  window.comfortFinish = () => {
+    if (selected.size === 0) return;
+    saveAndFinish(1, 1, "Your kit, your way! 🌟");
+  };
+  window.comfortSkip = () => saveAndFinish(1, 1, "Thanks for exploring! 🌟");
+
+  render();
+}
+
+function initChoiceAdventure() {
+  const box = document.getElementById("act-box");
+  if (!box) throw new Error("My Choice Adventure activity container was not found.");
+  box.innerHTML = `
+    <div class="act-header">
+      <span class="act-title">🌈 My Choice Adventure</span>
+      <span id="choice-step">Scene 1 / 3</span>
+    </div>
+    <p class="game-instructions">Help Kai through the day. Choose what feels right—there is no single correct answer.</p>
+    <div class="choice-story-card">
+      <div class="choice-story-scene" id="choice-scene" aria-hidden="true"></div>
+      <h2 id="choice-prompt"></h2>
+      <div class="story-opts" id="choice-options"></div>
+    </div>
+    <p class="choice-outcome" id="choice-outcome" aria-live="polite"></p>
+    <button class="game-action" id="choice-next" type="button" style="display:none" onclick="choiceNext()">Next scene →</button>
+  `;
+  const scenes = [
+    {
+      icon: "🎨🔊",
+      prompt: "The art room feels louder than Kai expected. What could Kai do?",
+      options: [
+        { label: "Ask to move somewhere quieter", outcome: "Kai asks for a quieter spot and feels ready to keep creating." },
+        { label: "Use headphones if they feel helpful", outcome: "Kai chooses headphones and takes the time they need." },
+        { label: "Watch for a little while first", outcome: "Kai watches until the room feels more familiar. That works too." }
+      ]
+    },
+    {
+      icon: "📅🔄",
+      prompt: "Kai's class plan changes. What might help?",
+      options: [
+        { label: "See the new plan", outcome: "Kai looks at what is coming next and feels more prepared." },
+        { label: "Ask someone to explain the change", outcome: "Kai asks a trusted person a clear question and gets an answer." },
+        { label: "Take a quiet moment before starting", outcome: "Kai takes a moment, then chooses when to begin." }
+      ]
+    },
+    {
+      icon: "⚽👋",
+      prompt: "Some children invite Kai to play. What can Kai choose?",
+      options: [
+        { label: "Join the game", outcome: "Kai joins in and finds a way to play that feels comfortable." },
+        { label: "Watch first, then decide", outcome: "Kai watches the game and can join later if they want." },
+        { label: "Say 'not now' and choose something else", outcome: "Kai lets the group know and picks another activity. That is okay." }
+      ]
+    }
+  ];
+  let step = 0;
+  let score = 0;
+
+  function render() {
+    const scene = scenes[step];
+    document.getElementById("choice-step").textContent = `Scene ${step + 1} / ${scenes.length}`;
+    document.getElementById("choice-scene").textContent = scene.icon;
+    document.getElementById("choice-prompt").textContent = scene.prompt;
+    document.getElementById("choice-outcome").textContent = "";
+    document.getElementById("choice-next").style.display = "none";
+    document.getElementById("choice-options").innerHTML = scene.options.map((option, index) =>
+      `<button class="story-opt" type="button" onclick="choiceSelect(${index})">${option.label}</button>`
+    ).join("");
+    if (step > 0) document.querySelector<HTMLButtonElement>(".story-opt")?.focus();
+  }
+
+  window.choiceSelect = index => {
+    const scene = scenes[step];
+    document.querySelectorAll<HTMLButtonElement>("#choice-options .story-opt").forEach(button => button.disabled = true);
+    document.getElementById("choice-outcome").textContent = scene.options[index].outcome;
+    score++;
+    const next = document.getElementById("choice-next") as HTMLButtonElement;
+    next.textContent = step === scenes.length - 1 ? "Finish adventure →" : "Next scene →";
+    next.style.display = "";
+    next.focus();
+  };
+  window.choiceNext = () => {
+    step++;
+    if (step >= scenes.length) return saveAndFinish(score, scenes.length, "You made the story your own! 🌈");
+    render();
+  };
+
+  render();
+}
+
 /* ═══════════════════════════════════════════════════════════════
    ROUTER — pick game based on card param
 ═══════════════════════════════════════════════════════════════ */
@@ -408,6 +543,8 @@ export function startActivityGame(cardKey) {
     case 'bw_done_autism_feelings': initFeelings(); break;
     case 'bw_done_autism_story': initStoryTime(); break;
     case 'bw_done_autism_sort': initSortMatch(); break;
+    case 'bw_done_autism_kit': initComfortKit(); break;
+    case 'bw_done_autism_choice': initChoiceAdventure(); break;
     default: initRoutine();
   }
 }

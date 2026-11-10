@@ -73,7 +73,7 @@ function HomePage() {
         <div className="hero-left anim-up">
           <div className="hero-eyebrow">✦ Learning made joyful</div>
           <h1>Every child deserves to <em>thrive</em> in learning</h1>
-          <p>BrightWays is a personalised adaptive platform for children with Autism, ADHD, and Dyslexia — with science-backed activities that actually feel like play.</p>
+          <p>BrightWays offers playful, self-paced activities for children with Autism, ADHD, and Dyslexia—with clear steps, lots of choices, and room to learn in their own way.</p>
           <div className="hero-btns">
             <a className="btn btn-primary btn-lg" href="register.html">Start for Free</a>
             <a className="btn btn-ghost btn-lg" href="login.html">I have an account</a>
@@ -81,7 +81,7 @@ function HomePage() {
         </div>
         <div className="hero-right">
           <Feature delay=".1s" icon="🧩" background="#FFF3E0" title="Autism Activities">Visual schedules, emotion recognition, social stories</Feature>
-          <Feature delay=".2s" icon="⚡" background="#F0F9FF" title="ADHD Focus Games">Short-burst tasks, memory challenges with timers</Feature>
+          <Feature delay=".2s" icon="⚡" background="#F0F9FF" title="ADHD Focus Games">Self-paced focus games and optional video breaks</Feature>
           <Feature delay=".3s" icon="📖" background="#FFF0F3" title="Dyslexia Phonics">Word recognition, sound matching, phonics fun</Feature>
           <Feature delay=".4s" icon="📊" background="#F0EFFF" title="Progress Dashboard">Charts, accuracy trends, session history</Feature>
         </div>
@@ -89,7 +89,7 @@ function HomePage() {
       <div className="stats-bar">
         <Stat value="3" label="Conditions Supported" />
         <Stat value="5–12" label="Age Range" />
-        <Stat value="12+" label="Activities" />
+        <Stat value="21" label="Activities" />
         <Stat value="Free" label="To Use" />
       </div>
     </div>
@@ -330,7 +330,7 @@ function RegisterPage() {
             <p>We'll tailor every activity to fit your child's learning style. You can update this anytime.</p>
             <div className="cond-grid">
               <ConditionCard value="Dyslexia" icon="📖" description="Phonics, word recognition & reading support" selected={condition === "Dyslexia"} onSelect={setCondition} />
-              <ConditionCard value="ADHD" icon="⚡" description="Short focus tasks, memory games & timers" selected={condition === "ADHD"} onSelect={setCondition} />
+              <ConditionCard value="ADHD" icon="⚡" description="Short, self-paced focus tasks & memory games" selected={condition === "ADHD"} onSelect={setCondition} />
               <ConditionCard value="Autism" icon="🌈" description="Visual schedules, emotion & social stories" selected={condition === "Autism"} onSelect={setCondition} />
             </div>
             {error && <div className="error-box" role="alert">{error}</div>}
@@ -377,20 +377,29 @@ const activitiesByCondition = {
   ADHD: [
     ["🧠", "Memory Match", 2, "Memory", "tag-sky", "c-sky", "activityadhd.html", "bw_done_adhd_memory"],
     ["⚡", "Quick Recall", 1, "Focus", "tag-teal", "c-teal", "activityadhd.html", "bw_done_adhd_recall"],
-    ["🎯", "Spot the Diff", 3, "Challenge", "tag-violet", "c-violet", "activityadhd.html", "bw_done_adhd_spot"],
-    ["🔢", "Number Dash", 2, "Attention", "tag-sun", "c-sun", "activityadhd.html", "bw_done_adhd_number"]
+    ["🎯", "Spot the Diff", 3, "Attention", "tag-violet", "c-violet", "activityadhd.html", "bw_done_adhd_spot"],
+    ["🔢", "Number Dash", 2, "Numbers", "tag-sun", "c-sun", "activityadhd.html", "bw_done_adhd_number"],
+    ["🔎", "Focus Finder", 1, "Visual", "tag-sky", "c-sky", "activityadhd.html", "bw_done_adhd_finder"],
+    ["🧩", "Step by Step", 2, "Planning", "tag-violet", "c-violet", "activityadhd.html", "bw_done_adhd_steps"],
+    ["🌱", "Move & Reset", 1, "Break", "tag-teal", "c-teal", "activityadhd.html", "bw_done_adhd_reset"],
+    ["🗺️", "Treasure Trail", 2, "Explore", "tag-sun", "c-sun", "activityadhd.html", "bw_done_adhd_trail"],
+    ["🐾", "Critter Creator", 1, "Create", "tag-rose", "c-rose", "activityadhd.html", "bw_done_adhd_critter"]
   ],
   Dyslexia: [
     ["🔤", "Phonics Play", 1, "Phonics", "tag-sun", "c-sun", "activitydyxlexia.html", "bw_done_dyslexia_phonics"],
     ["📖", "Word Match", 2, "Reading", "tag-teal", "c-teal", "activitydyxlexia.html", "bw_done_dyslexia_word"],
     ["🎵", "Rhyme Time", 2, "Phonics", "tag-rose", "c-rose", "activitydyxlexia.html", "bw_done_dyslexia_rhyme"],
-    ["🔡", "Letter Sounds", 3, "Challenge", "tag-violet", "c-violet", "activitydyxlexia.html", "bw_done_dyslexia_letters"]
+    ["🔡", "Letter Sounds", 3, "Challenge", "tag-violet", "c-violet", "activitydyxlexia.html", "bw_done_dyslexia_letters"],
+    ["🧱", "Word Builder", 2, "Word Play", "tag-sun", "c-sun", "activitydyxlexia.html", "bw_done_dyslexia_builder"],
+    ["🧭", "Syllable Safari", 1, "Word Parts", "tag-teal", "c-teal", "activitydyxlexia.html", "bw_done_dyslexia_syllables"]
   ],
   Autism: [
     ["📅", "My Routine", 1, "Daily", "tag-violet", "c-violet", "activityautism.html", "bw_done_autism_routine"],
     ["😊", "Feelings", 2, "Emotions", "tag-rose", "c-rose", "activityautism.html", "bw_done_autism_feelings"],
     ["📖", "Story Time", 2, "Social", "tag-teal", "c-teal", "activityautism.html", "bw_done_autism_story"],
-    ["🎨", "Sort & Match", 1, "Visual", "tag-sky", "c-sky", "activityautism.html", "bw_done_autism_sort"]
+    ["🎨", "Sort & Match", 1, "Visual", "tag-sky", "c-sky", "activityautism.html", "bw_done_autism_sort"],
+    ["🧰", "My Comfort Kit", 1, "My Choices", "tag-teal", "c-teal", "activityautism.html", "bw_done_autism_kit"],
+    ["🌈", "My Choice Adventure", 2, "Story", "tag-rose", "c-rose", "activityautism.html", "bw_done_autism_choice"]
   ]
 } as const;
 
@@ -443,6 +452,23 @@ function ChildDashboard() {
         <div className="prog-section"><div className="prog-top"><span>Today's Progress</span><strong>{activities.length ? `${activities.filter(activity => completed.has(activity[7])).length} / ${activities.length} done` : "Activities unavailable"}</strong></div><div className="prog-track"><div className="prog-fill" style={{ width: `${activities.length ? activities.filter(activity => completed.has(activity[7])).length / activities.length * 100 : 0}%` }} /></div></div>
         <div className="section-head"><h3>🎮 Your Activities</h3></div>
         {activities.length ? <div className="act-grid">{activities.map(activity => <a key={activity[7]} className={`act-card ${activity[5]}${completed.has(activity[7]) ? " completed" : ""}`} href={`${activity[6]}?card=${activity[7]}`}><span className="act-icon">{activity[0]}</span><div className="act-name">{activity[1]}</div><div className="act-stars">{"⭐".repeat(activity[2])}{"☆".repeat(3 - activity[2])}</div><span className={`act-tag ${activity[4]}`}>{activity[3]}</span></a>)}</div> : <div className="act-grid">Your activities are not set up yet. Please ask your caregiver to check your profile.</div>}
+        {condition === "ADHD" && <section className="video-breaks" aria-labelledby="video-breaks-title">
+          <div className="video-breaks-heading">
+            <div><h3 id="video-breaks-title">📺 Optional video breaks</h3><p>Choose one short video, then come back when you feel ready.</p></div>
+            <span className="video-breaks-note">Ask an adult to preview videos first.</span>
+          </div>
+          <div className="video-breaks-grid">
+            <a href="https://www.youtube.com/results?search_query=GoNoodle+mindful+breathing+for+kids" target="_blank" rel="noopener noreferrer">
+              <span aria-hidden="true">🌬️</span><strong>Calm breathing</strong><small>Find a GoNoodle breathing break</small>
+            </a>
+            <a href="https://www.youtube.com/results?search_query=Cosmic+Kids+Yoga+short+focus+break" target="_blank" rel="noopener noreferrer">
+              <span aria-hidden="true">🧘</span><strong>Gentle movement</strong><small>Find a short Cosmic Kids yoga break</small>
+            </a>
+            <a href="https://www.youtube.com/results?search_query=Sesame+Street+belly+breathing+for+kids" target="_blank" rel="noopener noreferrer">
+              <span aria-hidden="true">🐥</span><strong>Take a breath</strong><small>Find a Sesame Street breathing video</small>
+            </a>
+          </div>
+        </section>}
       </main>
     </>
   );
